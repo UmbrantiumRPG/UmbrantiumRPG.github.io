@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>UMBRANTIUM — Ficha</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="logo">UMBRANTIUM</div>
+    <nav>
+      <a href="index.html" class="active">Ficha</a>
+      <a href="inventario.html">Inventário</a>
+      <a href="habilidades.html">Habilidades</a>
+    </nav>
+    <div class="brand-small">Umbrantium</div>
+    <button class="toggle" id="menuToggle">☰</button>
+  </aside>
+
+  <main class="content">
+    <header class="top-header">
+      <h1>UMBRANTIUM</h1>
+      <p class="subtitle">Ficha de Personagem</p>
+    </header>
+
+    <section class="sheet">
+      <div class="left-col">
+
+                <div class="panel basics">
+          <label>Personagem<input id="personagem" type="text"></label>
+          <label>Jogador<input id="jogador" type="text"></label>
+          <label>Origem<input id="origem" type="text"></label>
+          <label>Classe<input id="classe" type="text"></label>
+        </div>
+
+        <div class="panel atributos">
+          <h2>Atributos</h2>
+          <div class="hex-grid">
+            <div class="hex"><label>AGI<input id="agi" type="number"></label></div>
+            <div class="hex"><label>INT<input id="int" type="number"></label></div>
+            <div class="hex"><label>VIG<input id="vig" type="number"></label></div>
+            <div class="hex"><label>PRE<input id="pre" type="number"></label></div>
+            <div class="hex"><label>FOR<input id="forca" type="number"></label></div>
+          </div>
+        </div>
+
+                <div class="panel vitals">
+          <div class="vital">
+            <label>PV (Maximo)<input id="pv" type="number"></label>
+          </div>
+          <div class="vital">
+            <label>MN (Maximo)<input id="mn" type="number"></label>
+          </div>
+          <div class="vital">
+            <label>ST (Maximo)<input id="st" type="number"></label>
+          </div>
+        </div>
+
+        <div class="panel vitals">
+          <div class="vital">
+            <label>PV (Atuais)<input id="pv" type="number"></label>
+          </div>
+          <div class="vital">
+            <label>MN (Atuais)<input id="mn" type="number"></label>
+          </div>
+          <div class="vital">
+            <label>ST (Atuais)<input id="st" type="number"></label>
+          </div>
+        </div>
+
+        <div class="panel defesa">
+          <label>Defesa (automática)<input id="defesa" type="text" readonly></label>
+          <small>= 10 + AGI + equipamentos + outros</small>
+        </div>
+
+        <div class="panel ataques">
+          <h3>Ataques</h3>
+          <div id="attacks-list" class="dynamic-list"></div>
+          <button type="button" id="add-attack" class="add-btn">+ Ataque</button>
+        </div>
+      </div> <!-- fim da left-col -->
+
+      <!-- right-col começa aqui: Perícias e outras seções -->
+      <div class="right-col">
+        <div class="panel pericias">
+          <h2>Perícias</h2>
+
+          <!-- MODELO 1 - Atletismo (FOR) -->
+          <div class="pericia" data-attr="forca">
+            <label>Atletismo</label>
+            <div class="dados">
+              <span class="calc">+0</span>
+
+              <div class="bonus-control">
+                <button class="minus">−</button>
+                <span class="bonus">0</span>
+                <button class="plus">+</button>
+              </div>
+
+              <input type="checkbox" class="treino" title="Treinado = +2">
+              <input type="number" class="outros" placeholder="Outros">
+              <button class="roll">🎲</button>
+            </div>
+          </div>
+
+          <!-- MODELO 2 - Acrobacia (DES) -->
+          <div class="pericia" data-attr="agi">
+            <label>Acrobacia</label>
+            <div class="dados">
+              <span class="calc">+0</span>
+              <div class="bonus-control">
+                <button class="minus">−</button>
+                <span class="bonus">0</span>
+                <button class="plus">+</button>
+              </div>
+              <input type="checkbox" class="treino" title="Treinado = +2">
+              <input type="number" class="outros" placeholder="Outros">
+              <button class="roll">🎲</button>
+            </div>
+          </div>
+
+          <!-- MODELO 3 - Furtividade (DES) -->
+          <div class="pericia" data-attr="agi">
+            <label>Furtividade</label>
+            <div class="dados">
+              <span class="calc">+0</span>
+              <div class="bonus-control">
+                <button class="minus">−</button>
+                <span class="bonus">0</span>
+                <button class="plus">+</button>
+              </div>
+              <input type="checkbox" class="treino" title="Treinado = +2">
+              <input type="number" class="outros" placeholder="Outros">
+              <button class="roll">🎲</button>
+            </div>
+          </div>
+
+          <!-- MODELO 4 - Percepção (PRE) -->
+          <div class="pericia" data-attr="pre">
+            <label>Percepção</label>
+            <div class="dados">
+              <span class="calc">+0</span>
+              <div class="bonus-control">
+                <button class="minus">−</button>
+                <span class="bonus">0</span>
+                <button class="plus">+</button>
+              </div>
+              <input type="checkbox" class="treino" title="Treinado = +2">
+              <input type="number" class="outros" placeholder="Outros">
+              <button class="roll">🎲</button>
+            </div>
+          </div>
+
+          <!-- MODELO 5 - Arcanismo (INT) (você pediu trocar Ocultismo) -->
+          <div class="pericia" data-attr="int">
+            <label>Arcanismo</label>
+            <div class="dados">
+              <span class="calc">+0</span>
+              <div class="bonus-control">
+                <button class="minus">−</button>
+                <span class="bonus">0</span>
+                <button class="plus">+</button>
+              </div>
+              <input type="checkbox" class="treino" title="Treinado = +2">
+              <input type="number" class="outros" placeholder="Outros">
+              <button class="roll">🎲</button>
+            </div>
+          </div>
+
+          <!-- Copie mais blocos .pericia abaixo para adicionar novas perícias -->
+        </div> <!-- fim pericias panel -->
+      </div> <!-- fim right-col -->
+    </section>
+
+    <footer class="footer">Umbrantium — Fichas salvas localmente no seu navegador</footer>
+  </main>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

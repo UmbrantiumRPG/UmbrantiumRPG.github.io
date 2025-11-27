@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>UMBRANTIUM — Inventário</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+
+<aside class="sidebar" id="sidebar">
+  <div class="logo">UMBRANTIUM</div>
+  <nav>
+    <a href="index.html">Ficha</a>
+    <a href="inventario.html" class="active">Inventário</a>
+    <a href="habilidades.html">Habilidades</a>
+  </nav>
+  <div class="brand-small">Umbrantium</div>
+  <button class="toggle" id="menuToggle2">☰</button>
+</aside>
+
+<main class="content">
+  <header class="top-header">
+    <h1>Inventário</h1>
+    <p class="subtitle">Gerencie os itens do personagem</p>
+  </header>
+
+  <section class="inventory-panel panel">
+    <h2>Mochila</h2>
+    
+    <!-- Cabeçalhos da lista -->
+    <div class="inv-header">
+      <span>Item</span>
+      <span>Descrição</span>
+      <span>Peso</span>
+      <span></span>
+    </div>
+
+    <!-- Lista gerada dinamicamente -->
+    <div id="inventory-list"></div>
+
+    <button class="add-item" onclick="addInventoryItem()">+ Adicionar Item</button>
+
+    <div class="total-weight">
+      Peso Total: <span id="totalWeight">0</span> kg
+    </div>
+  </section>
+
+  <footer class="footer">Dados salvos automaticamente</footer>
+</main>
+
+</div>
+<script src="script.js"></script>
+</body>
+</html>
