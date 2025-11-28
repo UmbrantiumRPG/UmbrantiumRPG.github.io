@@ -9,6 +9,38 @@ const pageKey = (() => {
 const prefix = 'umbrantium-' + pageKey + '-';
 
 // ----------------------
+// Menu Mobile
+// ----------------------
+function initMobileMenu() {
+    const sidebar = document.getElementById('sidebar');
+    const toggleButtons = document.querySelectorAll('[id^="menuToggle"]');
+    
+    toggleButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            sidebar.classList.toggle('open');
+        });
+    });
+    
+    // Fecha o menu ao clicar fora
+    document.addEventListener('click', (e) => {
+        if (sidebar && sidebar.classList.contains('open')) {
+            if (!sidebar.contains(e.target) && !e.target.closest('[id^="menuToggle"]')) {
+                sidebar.classList.remove('open');
+            }
+        }
+    });
+    
+    // Fecha o menu ao clicar em um link
+    const navLinks = sidebar?.querySelectorAll('nav a');
+    navLinks?.forEach(link => {
+        link.addEventListener('click', () => {
+            sidebar.classList.remove('open');
+        });
+    });
+}
+
+// ----------------------
 // Campos (salvar/carregar)
 // ----------------------
 function saveField(el) {
@@ -376,6 +408,9 @@ function loadNotes(){
 // Inicialização
 // ----------------------
 window.addEventListener('DOMContentLoaded', ()=> {
+    // Inicializa o menu mobile
+    initMobileMenu();
+    
     autoBindFields();
 
     // Inventário
