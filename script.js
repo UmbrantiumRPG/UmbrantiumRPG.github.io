@@ -343,6 +343,124 @@ function showRollModal(rolls, highest, mod, total, skillName) {
 // ----------------------
 // Utilidades
 // ----------------------
+// ----------------------
+// Exportar/Importar Ficha
+// ----------------------
+function exportarFicha() {
+    const dados = {};
+    
+    // Coleta todos os dados do localStorage com o prefixo correto
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key.startsWith('umbrantium-')) {
+            dados[key] = localStorage.getItem(key);
+        }
+    }
+    
+    // Cria um objeto JSON
+    const fichaData = {
+        versao: '1.0',
+        dataExportacao: new Date().toISOString(),
+        dados: dados
+    };
+    
+    // Converte para JSON e cria um blob
+    const jsonString = JSON.stringify(fichaData, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    
+    // Cria um link de download
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    
+    // Nome do arquivo com data
+    const nomePersonagem = localStorage.getItem('umbrantium-index-personagem') || 'Ficha';
+    const dataFormatada = new Date().toISOString().split('T')[0];
+    a.download = `${nomePersonagem}_${dataFormatada}.json`;
+    
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    mostrarNotificacao('Ficha exportada com sucesso!', 'success');
+}
+
+function importarFicha(arquivo) {
+    const reader = new FileReader();
+    
+    reader.onload = function(e) {
+        try {
+            const fichaData = JSON.parse(e.target.result);
+            
+            // Validação básica
+            if (!fichaData.dados) {
+                throw new Error('Arquivo inválido');
+            }
+            
+            // Confirmação antes de sobrescrever
+            const confirmar = confirm(
+                'Importar esta ficha irá sobrescrever todos os dados atuais. Deseja continuar?\n\n' +
+                'Dica: Exporte sua ficha atual primeiro como backup!'
+            );
+            
+            if (!confirmar) return;
+            
+            // Limpa dados antigos do Umbrantium
+            const keysParaRemover = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.startsWith('umbrantium-')) {
+                    keysParaRemover.push(key);
+                }
+            }
+            keysParaRemover.forEach(key => localStorage.removeItem(key));
+            
+            // Importa novos dados
+            Object.keys(fichaData.dados).forEach(key => {
+                localStorage.setItem(key, fichaData.dados[key]);
+            });
+            
+            mostrarNotificacao('Ficha importada com sucesso! Recarregando página...', 'success');
+            
+            // Recarrega a página após 1 segundo
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+            
+        } catch (erro) {
+            mostrarNotificacao('Erro ao importar ficha. Verifique se o arquivo é válido.', 'error');
+            console.error('Erro na importação:', erro);
+        }
+    };
+    
+    reader.readAsText(arquivo);
+}
+
+function mostrarNotificacao(mensagem, tipo = 'info') {
+    const existente = document.querySelector('.notificacao');
+    if (existente) existente.remove();
+    
+    const notif = document.createElement('div');
+    notif.className = `notificacao notificacao-${tipo}`;
+    notif.textContent = mensagem;
+    
+    document.body.appendChild(notif);
+    
+    setTimeout(() => {
+        notif.classList.add('show');
+    }, 10);
+    
+    setTimeout(() => {
+        notif.classList.remove('show');
+        setTimeout(() => notif.remove(), 300);
+    }, 3000);
+}
+
+// ----------------------
+// Utilidades
+// ----------------------
+
 function escapeHtml(str){
     if (str === null || str === undefined) return "";
     return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -465,8 +583,143 @@ window.addEventListener('DOMContentLoaded', ()=> {
         });
     }
 
-    // Salvar campos automaticamente
+// Salvar campos automaticamente
     document.addEventListener('input', ()=> {
         document.querySelectorAll("input[id], textarea[id], select[id]").forEach(el => saveField(el));
     });
+
+    // Exportar/Importar
+    const exportBtn = document.getElementById('export-btn');
+    const importBtn = document.getElementById('import-btn');
+    const importFile = document.getElementById('import-file');
+    
+    if (exportBtn) {
+        exportBtn.addEventListener('click', exportarFicha);
+    }
+    
+    if (importBtn && importFile) {
+        importBtn.addEventListener('click', () => {
+            importFile.click();
+        });
+        
+        importFile.addEventListener('change', (e) => {
+            const arquivo = e.target.files[0];
+            if (arquivo) {
+                importarFicha(arquivo);
+            }
+            // Limpa o input para permitir importar o mesmo arquivo novamente
+            e.target.value = '';
+        });
+    }
 });
+
+function mostrarNotificacao(mensagem, tipo = 'info') {
+    const existente = document.querySelector('.notificacao');
+    if (existente) existente.remove();
+    
+    const notif = document.createElement('div');
+    notif.className = `notificacao notificacao-${tipo}`;
+    notif.textContent = mensagem;
+    
+    document.body.appendChild(notif);
+    
+    setTimeout(() => {
+        notif.classList.add('show');
+    }, 10);
+    
+    setTimeout(() => {
+        notif.classList.remove('show');
+        setTimeout(() => notif.remove(), 300);
+    }, 3000);
+}
+
+function limparTodosDados() {
+    // Modal de confirmação customizado
+    const modal = document.createElement('div');
+    modal.className = 'confirm-modal';
+    modal.innerHTML = `
+        <div class="confirm-modal-content">
+            <h3>⚠️ Confirmar Limpeza</h3>
+            <p>Tem certeza que deseja limpar TODOS os dados da ficha?</p>
+            <p class="confirm-warning">Esta ação é irreversível e apagará:</p>
+            <ul class="confirm-list">
+                <li>Informações do personagem</li>
+                <li>Atributos e perícias</li>
+                <li>Inventário completo</li>
+                <li>Ataques cadastrados</li>
+                <li>Habilidades e magias</li>
+                <li>Todas as notas e anotações</li>
+            </ul>
+            <p class="confirm-tip">💡 Dica: Exporte sua ficha antes de limpar como backup!</p>
+            <div class="confirm-buttons">
+                <button class="confirm-cancel">Cancelar</button>
+                <button class="confirm-delete">Sim, Limpar Tudo</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Evento para cancelar
+    modal.querySelector('.confirm-cancel').addEventListener('click', () => {
+        modal.remove();
+    });
+    
+    // Evento para confirmar
+    modal.querySelector('.confirm-delete').addEventListener('click', () => {
+        // Remove todos os dados do Umbrantium
+        const keysParaRemover = [];
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.startsWith('umbrantium-')) {
+                keysParaRemover.push(key);
+            }
+        }
+        
+        keysParaRemover.forEach(key => localStorage.removeItem(key));
+        
+        modal.remove();
+        mostrarNotificacao('Todos os dados foram limpos! Recarregando página...', 'success');
+        
+        // Recarrega a página após 1.5 segundos
+        setTimeout(() => {
+            location.reload();
+        }, 1500);
+    });
+    
+    // Fecha ao clicar fora
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.remove();
+        }
+    });
+}
+
+// Exportar/Importar
+    const exportBtn = document.getElementById('export-btn');
+    const importBtn = document.getElementById('import-btn');
+    const importFile = document.getElementById('import-file');
+    const clearBtn = document.getElementById('clear-btn');
+    
+    if (exportBtn) {
+        exportBtn.addEventListener('click', exportarFicha);
+    }
+    
+    if (importBtn && importFile) {
+        importBtn.addEventListener('click', () => {
+            importFile.click();
+        });
+        
+        importFile.addEventListener('change', (e) => {
+            const arquivo = e.target.files[0];
+            if (arquivo) {
+                importarFicha(arquivo);
+            }
+            // Limpa o input para permitir importar o mesmo arquivo novamente
+            e.target.value = '';
+        });
+    }
+    
+    if (clearBtn) {
+        clearBtn.addEventListener('click', limparTodosDados);
+    }

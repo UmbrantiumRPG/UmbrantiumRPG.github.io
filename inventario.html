@@ -13,12 +13,20 @@
   <div class="logo">UMBRANTIUM</div>
   <nav>
     <a href="index.html">Ficha</a>
-    <a href="inventario.html" class="active">Inventário</a>
+    <a href="inventario.html">Inventário</a>
     <a href="habilidades.html">Habilidades</a>
     <a href="notas.html">Notas</a>
   </nav>
+  
+<div class="sidebar-export">
+    <button id="export-btn" class="sidebar-btn">📥 Exportar</button>
+    <button id="import-btn" class="sidebar-btn">📤 Importar</button>
+    <button id="clear-btn" class="sidebar-btn sidebar-btn-danger">🗑️ Limpar Tudo</button>
+    <input type="file" id="import-file" accept=".json" style="display:none">
+  </div>
+  
   <div class="brand-small">Umbrantium</div>
-  <button class="toggle" id="menuToggle2">☰</button>
+  <button class="toggle" id="menuToggle">☰</button>
 </aside>
 
 <main class="content">
