@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>UMBRANTIUM — Personagens</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+
+<aside class="sidebar" id="sidebar">
+  <div class="logo">UMBRANTIUM</div>
+<nav>
+  <a href="personagens.html">Personagens</a>
+  <a href="index.html">Ficha Atual</a>
+  <a href="inventario.html">Inventário</a>
+  <a href="habilidades.html">Habilidades</a>
+  <a href="notas.html">Notas</a>
+</nav>
+  
+<div class="sidebar-export">
+  <button id="export-btn" class="sidebar-btn">📥 Exportar</button>
+  <button id="import-btn" class="sidebar-btn">📤 Importar</button>
+  <button id="clear-btn" class="sidebar-btn sidebar-btn-danger">🗑️ Limpar Tudo</button>
+  <input type="file" id="import-file" accept=".json" style="display:none">
+</div>
+
+<div class="sidebar-theme">
+  <label for="theme-selector">🎨 Tema</label>
+  <select id="theme-selector" class="theme-select">
+    <option value="dark">Escuro (Padrão)</option>
+    <option value="light">Claro</option>
+    <option value="blue">Azul Oceano</option>
+    <option value="forest">Verde Floresta</option>
+    <option value="purple">Roxo Místico</option>
+    <option value="crimson">Vermelho Carmesim</option>
+  </select>
+</div>
+  
+  <div class="brand-small">Umbrantium</div>
+  <button class="toggle" id="menuToggle">☰</button>
+</aside>
+
+<main class="content">
+  <header class="top-header">
+    <h1>Gerenciador de Personagens</h1>
+    <p class="subtitle">Crie e alterne entre diferentes personagens</p>
+  </header>
+
+  <section class="panel characters-panel">
+    <div class="characters-header">
+      <h2>Seus Personagens</h2>
+      <button id="create-character" class="add-btn">+ Novo Personagem</button>
+    </div>
+
+    <div id="characters-list" class="characters-grid"></div>
+
+    <div class="empty-state" id="empty-state" style="display:none;">
+      <div class="empty-icon">👤</div>
+      <h3>Nenhum personagem criado ainda</h3>
+      <p>Crie seu primeiro personagem para começar sua aventura!</p>
+    </div>
+  </section>
+
+  <footer class="footer">Umbrantium — Gerencie múltiplos personagens</footer>
+</main>
+
+</div>
+
+<!-- Modal de Criar/Editar Personagem -->
+<div id="character-modal" class="character-modal" style="display:none;">
+  <div class="character-modal-content">
+    <h3 id="modal-title">Novo Personagem</h3>
+    <form id="character-form">
+      <label>
+        Nome do Personagem *
+        <input type="text" id="char-name" required placeholder="Ex: Aragorn">
+      </label>
+      <label>
+        Classe
+        <input type="text" id="char-class" placeholder="Ex: Guerreiro">
+      </label>
+      <label>
+        Nível
+        <input type="number" id="char-level" value="1" min="1">
+      </label>
+      <div class="modal-buttons">
+        <button type="button" class="confirm-cancel" id="cancel-char">Cancelar</button>
+        <button type="submit" class="confirm-save">Salvar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="script.js"></script>
+<script src="personagens.js"></script>
+</body>
+</html>

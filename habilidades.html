@@ -12,19 +12,32 @@
 
 <aside class="sidebar" id="sidebar">
   <div class="logo">UMBRANTIUM</div>
-  <nav>
-    <a href="index.html">Ficha</a>
-    <a href="inventario.html">Inventário</a>
-    <a href="habilidades.html">Habilidades</a>
-    <a href="notas.html">Notas</a>
-  </nav>
+<nav>
+  <a href="personagens.html">Personagens</a>
+  <a href="index.html">Ficha Atual</a>
+  <a href="inventario.html">Inventário</a>
+  <a href="habilidades.html">Habilidades</a>
+  <a href="notas.html">Notas</a>
+</nav>
   
 <div class="sidebar-export">
-    <button id="export-btn" class="sidebar-btn">📥 Exportar</button>
-    <button id="import-btn" class="sidebar-btn">📤 Importar</button>
-    <button id="clear-btn" class="sidebar-btn sidebar-btn-danger">🗑️ Limpar Tudo</button>
-    <input type="file" id="import-file" accept=".json" style="display:none">
-  </div>
+  <button id="export-btn" class="sidebar-btn">📥 Exportar</button>
+  <button id="import-btn" class="sidebar-btn">📤 Importar</button>
+  <button id="clear-btn" class="sidebar-btn sidebar-btn-danger">🗑️ Limpar Tudo</button>
+  <input type="file" id="import-file" accept=".json" style="display:none">
+</div>
+
+<div class="sidebar-theme">
+  <label for="theme-selector">🎨 Tema</label>
+  <select id="theme-selector" class="theme-select">
+    <option value="dark">Escuro (Padrão)</option>
+    <option value="light">Claro</option>
+    <option value="blue">Azul Oceano</option>
+    <option value="forest">Verde Floresta</option>
+    <option value="purple">Roxo Místico</option>
+    <option value="crimson">Vermelho Carmesim</option>
+  </select>
+</div>
   
   <div class="brand-small">Umbrantium</div>
   <button class="toggle" id="menuToggle">☰</button>

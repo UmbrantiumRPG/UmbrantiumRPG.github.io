@@ -8,6 +8,8 @@ const pageKey = (() => {
 // Prefixo único por página
 const prefix = 'umbrantium-' + pageKey + '-';
 
+
+
 // ----------------------
 // Menu Mobile
 // ----------------------
@@ -456,6 +458,25 @@ function mostrarNotificacao(mensagem, tipo = 'info') {
         setTimeout(() => notif.remove(), 300);
     }, 3000);
 }
+// ----------------------
+// Sistema de Temas
+// ----------------------
+const THEME_KEY = 'umbrantium-theme';
+
+function loadTheme() {
+    const savedTheme = localStorage.getItem(THEME_KEY) || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    
+    const themeSelector = document.getElementById('theme-selector');
+    if (themeSelector) {
+        themeSelector.value = savedTheme;
+    }
+}
+
+function setTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem(THEME_KEY, theme);
+}
 
 // ----------------------
 // Utilidades
@@ -526,9 +547,20 @@ function loadNotes(){
 // Inicialização
 // ----------------------
 window.addEventListener('DOMContentLoaded', ()=> {
-    // Inicializa o menu mobile
+
+        // Carrega o tema salvo
+    loadTheme();
+
+        // Event listener para mudança de tema
+    const themeSelector = document.getElementById('theme-selector');
+    if (themeSelector) {
+        themeSelector.addEventListener('change', (e) => {
+            setTheme(e.target.value);
+            mostrarNotificacao('Tema alterado!', 'success');
+        });
+    }
+        // Inicializa o menu mobile
     initMobileMenu();
-    
     autoBindFields();
 
     // Inventário
@@ -723,3 +755,152 @@ function limparTodosDados() {
     if (clearBtn) {
         clearBtn.addEventListener('click', limparTodosDados);
     }
+
+    // ----------------------
+// Sistema de Som
+// ----------------------
+const SOUND_ENABLED_KEY = 'umbrantium-sound-enabled';
+
+function isSoundEnabled() {
+    const saved = localStorage.getItem(SOUND_ENABLED_KEY);
+    return saved === null ? true : saved === 'true';
+}
+
+function setSoundEnabled(enabled) {
+    localStorage.setItem(SOUND_ENABLED_KEY, enabled.toString());
+}
+
+// Gerar som de rolagem usando Web Audio API
+function playDiceSound() {
+    if (!isSoundEnabled()) return;
+    
+    try {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        
+        // Som de rolagem (múltiplos cliques rápidos)
+        const times = [0, 0.05, 0.1, 0.15, 0.2, 0.3, 0.5, 0.7];
+        times.forEach(time => {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = 200 + Math.random() * 100;
+            oscillator.type = 'triangle';
+            
+            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime + time);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + time + 0.05);
+            
+            oscillator.start(audioContext.currentTime + time);
+            oscillator.stop(audioContext.currentTime + time + 0.05);
+        });
+        
+        // Som de conclusão
+        setTimeout(() => {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = 400;
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+            
+            oscillator.start();
+            oscillator.stop(audioContext.currentTime + 0.3);
+        }, 800);
+    } catch (e) {
+        console.log('Audio não disponível');
+    }
+}
+
+// ----------------------
+// Modal de rolagem
+// ----------------------
+function showRollModal(rolls, highest, mod, total, skillName) {
+    const existing = document.querySelector('.roll-modal');
+    if(existing) existing.remove();
+    
+    // Toca o som
+    playDiceSound();
+    
+    const modal = document.createElement('div');
+    modal.className = 'roll-modal';
+    
+    // Cria o dado 3D
+    const diceRotations = [
+        { x: 0, y: 0 },      // 1
+        { x: 180, y: 0 },    // 2
+        { x: 0, y: 90 },     // 3
+        { x: 0, y: -90 },    // 4
+        { x: -90, y: 0 },    // 5
+        { x: 90, y: 0 }      // 6
+    ];
+    
+    // Para d20, adapta as rotações
+    const faceIndex = Math.min(highest - 1, 5);
+    const rotation = diceRotations[faceIndex] || { x: 0, y: 0 };
+    
+    const dice3D = `
+        <div class="dice-animation-area">
+            <div class="dice-3d" style="--final-x: ${rotation.x}deg; --final-y: ${rotation.y}deg;">
+                <div class="dice-face front">${highest}</div>
+                <div class="dice-face back">${rolls[1] || 1}</div>
+                <div class="dice-face right">${rolls[2] || 1}</div>
+                <div class="dice-face left">${rolls[3] || 1}</div>
+                <div class="dice-face top">${rolls[4] || 1}</div>
+                <div class="dice-face bottom">${rolls[5] || 1}</div>
+            </div>
+        </div>
+    `;
+    
+    const diceList = rolls.map((r, i) => 
+        `<span class="roll-die ${r === highest ? 'highest' : ''}" style="animation-delay: ${i * 0.1}s">${r}</span>`
+    ).join('');
+    
+    const soundIcon = isSoundEnabled() ? '🔊' : '🔇';
+    
+    modal.innerHTML = `
+        <div class="roll-modal-content">
+            <button class="sound-toggle ${isSoundEnabled() ? '' : 'muted'}" id="toggle-sound" title="Ativar/Desativar Som">
+                ${soundIcon}
+            </button>
+            <h3>🎲 ${skillName}</h3>
+            ${dice3D}
+            <p>Dados rolados (${rolls.length}d20):</p>
+            <div class="roll-dice-list">
+                ${diceList}
+            </div>
+            <div class="roll-summary">
+                <p><strong>Maior resultado:</strong> ${highest}</p>
+                <p><strong>Modificadores:</strong> ${mod >= 0 ? '+' + mod : mod}</p>
+                <p class="roll-total">TOTAL: ${total}</p>
+            </div>
+            <button class="roll-close">Fechar</button>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Toggle de som
+    const soundToggle = modal.querySelector('#toggle-sound');
+    if (soundToggle) {
+        soundToggle.addEventListener('click', () => {
+            const newState = !isSoundEnabled();
+            setSoundEnabled(newState);
+            soundToggle.textContent = newState ? '🔊' : '🔇';
+            soundToggle.classList.toggle('muted', !newState);
+        });
+    }
+    
+    modal.querySelector('.roll-close').addEventListener('click', () => modal.remove());
+    modal.addEventListener('click', (e) => {
+        if(e.target === modal) modal.remove();
+    });
+}
+
+// ----------------------
