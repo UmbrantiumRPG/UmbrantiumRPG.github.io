@@ -697,29 +697,32 @@ window.addEventListener('DOMContentLoaded', ()=> {
         document.querySelectorAll("input[id], textarea[id], select[id]").forEach(el => saveField(el));
     });
 
-    // Exportar/Importar
+   // --- CORREÇÃO PARA IOS (IMPORT/EXPORT) ---
     const exportBtn = document.getElementById('export-btn');
     const importBtn = document.getElementById('import-btn');
     const importFile = document.getElementById('import-file');
-    
-    if (exportBtn) {
-        exportBtn.addEventListener('click', exportarFicha);
-    }
-    
+    const clearBtn = document.getElementById('clear-btn');
+
+    if (exportBtn) exportBtn.onclick = exportarFicha;
+
     if (importBtn && importFile) {
-        importBtn.addEventListener('click', () => {
-            importFile.click();
+        importBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            importFile.click(); // Disparo de clique
         });
-        
-        importFile.addEventListener('change', (e) => {
-            const arquivo = e.target.files[0];
+
+        importFile.addEventListener('change', function(e) {
+            const arquivo = this.files[0];
             if (arquivo) {
-                importarFicha(arquivo);
+                // Pequeno delay ajuda o Safari a liberar o arquivo para leitura
+                setTimeout(() => {
+                    importarFicha(arquivo);
+                }, 100);
             }
-            // Limpa o input para permitir importar o mesmo arquivo novamente
-            e.target.value = '';
-        });
+        }, false);
     }
+
+    if (clearBtn) clearBtn.onclick = limparTodosDados;
 });
 
 function mostrarNotificacao(mensagem, tipo = 'info') {
