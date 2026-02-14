@@ -1,181 +1,203 @@
-// personagens.js - Sistema de múltiplos personagens
+// =====================================================
+// SISTEMA DE GERENCIAMENTO DE MÚLTIPLOS PERSONAGENS
+// =====================================================
 
-const CHARACTERS_KEY = 'umbrantium-characters';
-const CURRENT_CHAR_KEY = 'umbrantium-current-character';
+const CHARACTERS_LIST_KEY = 'umbrantium-characters-list';
+const CURRENT_CHARACTER_KEY = 'umbrantium-current-character';
 
-// Estrutura de dados de personagens
-function getCharacters() {
-    const data = localStorage.getItem(CHARACTERS_KEY);
-    return data ? JSON.parse(data) : [];
+// =====================================================
+// FUNÇÕES PRINCIPAIS
+// =====================================================
+
+function initCharacterSystem() {
+    loadCharactersList();
+    setupEventListeners();
 }
 
-function saveCharacters(characters) {
-    localStorage.setItem(CHARACTERS_KEY, JSON.stringify(characters));
-}
-
-function getCurrentCharacterId() {
-    return localStorage.getItem(CURRENT_CHAR_KEY) || null;
-}
-
-function setCurrentCharacter(id) {
-    localStorage.setItem(CURRENT_CHAR_KEY, id);
-}
-
-// Coletar todos os dados de um personagem
-function collectCharacterData(charId) {
-    const data = {};
-    for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && key.startsWith('umbrantium-') && 
-            !key.includes('characters') && 
-            !key.includes('current-character') &&
-            !key.includes('theme')) {
-            data[key] = localStorage.getItem(key);
-        }
-    }
-    return data;
-}
-
-// Restaurar dados de um personagem
-function restoreCharacterData(data) {
-    // Limpa dados atuais (exceto sistema)
-    const keysToRemove = [];
-    for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && key.startsWith('umbrantium-') && 
-            !key.includes('characters') && 
-            !key.includes('current-character') &&
-            !key.includes('theme')) {
-            keysToRemove.push(key);
-        }
-    }
-    keysToRemove.forEach(k => localStorage.removeItem(k));
-    
-    // Restaura novos dados
-    Object.keys(data).forEach(key => {
-        localStorage.setItem(key, data[key]);
-    });
-}
-
-// Renderizar lista de personagens
-function renderCharacters() {
-    const characters = getCharacters();
-    const currentId = getCurrentCharacterId();
+// Carrega a lista de personagens
+function loadCharactersList() {
+    const characters = getAllCharacters();
     const container = document.getElementById('characters-list');
     const emptyState = document.getElementById('empty-state');
     
     if (!container) return;
     
+    container.innerHTML = '';
+    
     if (characters.length === 0) {
-        container.innerHTML = '';
         if (emptyState) emptyState.style.display = 'block';
         return;
     }
     
     if (emptyState) emptyState.style.display = 'none';
     
-    container.innerHTML = characters.map(char => `
-        <div class="character-card ${char.id === currentId ? 'active' : ''}" data-char-id="${char.id}">
-            <div class="char-avatar">${char.name.charAt(0).toUpperCase()}</div>
-            <div class="char-info">
-                <h3>${escapeHtml(char.name)}</h3>
-                <p class="char-class">${escapeHtml(char.class || 'Sem classe')}</p>
-                <p class="char-level">Nível ${char.level || 1}</p>
-                <p class="char-date">Criado: ${new Date(char.created).toLocaleDateString('pt-BR')}</p>
-            </div>
-            <div class="char-actions">
-                ${char.id === currentId ? '<span class="char-badge">Atual</span>' : ''}
-                <button class="char-btn char-switch" data-id="${char.id}" title="Trocar para este personagem">
-                    🎭 Usar
-                </button>
-                <button class="char-btn char-share" data-id="${char.id}" title="Compartilhar">
-                    🔗 Compartilhar
-                </button>
-                <button class="char-btn char-export" data-id="${char.id}" title="Exportar">
-                    📥
-                </button>
-                <button class="char-btn char-delete" data-id="${char.id}" title="Deletar">
-                    🗑️
-                </button>
-            </div>
-        </div>
-    `).join('');
+    const currentCharId = getCurrentCharacterId();
     
-    // Event listeners
-    container.querySelectorAll('.char-switch').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            switchCharacter(btn.dataset.id);
-        });
-    });
-    
-    container.querySelectorAll('.char-share').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            shareCharacter(btn.dataset.id);
-        });
-    });
-    
-    container.querySelectorAll('.char-export').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            exportCharacter(btn.dataset.id);
-        });
-    });
-    
-    container.querySelectorAll('.char-delete').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            deleteCharacter(btn.dataset.id);
-        });
+    characters.forEach(char => {
+        const card = createCharacterCard(char, char.id === currentCharId);
+        container.appendChild(card);
     });
 }
 
+// Cria um card de personagem
+function createCharacterCard(character, isActive) {
+    const card = document.createElement('div');
+    card.className = `character-card ${isActive ? 'active' : ''}`;
+    card.dataset.charId = character.id;
+    
+    const badge = isActive ? '<span class="active-badge">✓ Ativo</span>' : '';
+    
+    card.innerHTML = `
+        ${badge}
+        <div class="character-info">
+            <h3>${escapeHtml(character.name)}</h3>
+            <p class="character-details">
+                ${character.class ? `<span>📚 ${escapeHtml(character.class)}</span>` : ''}
+                ${character.level ? `<span>⭐ Nível ${escapeHtml(character.level)}</span>` : ''}
+            </p>
+            <p class="character-date">Criado: ${formatDate(character.created)}</p>
+        </div>
+        <div class="character-actions">
+            ${!isActive ? `<button class="char-btn char-btn-select" onclick="selectCharacter('${character.id}')">
+                Selecionar
+            </button>` : ''}
+            <button class="char-btn char-btn-edit" onclick="editCharacter('${character.id}')">
+                ✏️ Editar
+            </button>
+            <button class="char-btn char-btn-delete" onclick="deleteCharacter('${character.id}')">
+                🗑️ Excluir
+            </button>
+        </div>
+    `;
+    
+    return card;
+}
+
+// Formata data
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('pt-BR');
+}
+
+// =====================================================
+// CRUD DE PERSONAGENS
+// =====================================================
+
+// Obter todos os personagens
+function getAllCharacters() {
+    const data = localStorage.getItem(CHARACTERS_LIST_KEY);
+    return data ? JSON.parse(data) : [];
+}
+
+// Salvar lista de personagens
+function saveCharactersList(characters) {
+    localStorage.setItem(CHARACTERS_LIST_KEY, JSON.stringify(characters));
+}
+
+// Obter personagem por ID
+function getCharacterById(id) {
+    const characters = getAllCharacters();
+    return characters.find(c => c.id === id);
+}
+
 // Criar novo personagem
-function createCharacter(name, charClass, level) {
-    const characters = getCharacters();
+function createNewCharacter(name, charClass, level) {
+    const characters = getAllCharacters();
+    
     const newChar = {
-        id: 'char-' + Date.now(),
+        id: generateId(),
         name: name,
-        class: charClass,
-        level: level,
-        created: new Date().toISOString(),
-        data: collectCharacterData()
+        class: charClass || '',
+        level: level || '1',
+        created: new Date().toISOString()
     };
     
     characters.push(newChar);
-    saveCharacters(characters);
-    
-    // Se for o primeiro personagem, torna-o ativo
-    if (characters.length === 1) {
-        setCurrentCharacter(newChar.id);
-    }
+    saveCharactersList(characters);
     
     return newChar;
 }
 
-// Trocar personagem ativo
-function switchCharacter(charId) {
-    const characters = getCharacters();
-    const currentId = getCurrentCharacterId();
-    const char = characters.find(c => c.id === charId);
+// Atualizar personagem
+function updateCharacter(id, updates) {
+    const characters = getAllCharacters();
+    const index = characters.findIndex(c => c.id === id);
     
-    if (!char) return;
+    if (index !== -1) {
+        characters[index] = { ...characters[index], ...updates };
+        saveCharactersList(characters);
+        return true;
+    }
     
-    // Salvar dados do personagem atual antes de trocar
-    if (currentId) {
-        const currentChar = characters.find(c => c.id === currentId);
-        if (currentChar) {
-            currentChar.data = collectCharacterData();
-            saveCharacters(characters);
+    return false;
+}
+
+// Deletar personagem
+function deleteCharacterById(id) {
+    const characters = getAllCharacters();
+    const currentCharId = getCurrentCharacterId();
+    
+    // Não pode deletar o personagem ativo
+    if (id === currentCharId) {
+        return false;
+    }
+    
+    const filtered = characters.filter(c => c.id !== id);
+    saveCharactersList(filtered);
+    
+    // Remove todos os dados desse personagem
+    removeCharacterData(id);
+    
+    return true;
+}
+
+// Remove todos os dados de um personagem
+function removeCharacterData(charId) {
+    const prefix = `umbrantium-${charId}-`;
+    const keysToRemove = [];
+    
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith(prefix)) {
+            keysToRemove.push(key);
         }
     }
     
-    // Restaurar dados do novo personagem
-    restoreCharacterData(char.data || {});
-    setCurrentCharacter(charId);
+    keysToRemove.forEach(key => localStorage.removeItem(key));
+}
+
+// =====================================================
+// GERENCIAMENTO DO PERSONAGEM ATUAL
+// =====================================================
+
+// Obter ID do personagem atual
+function getCurrentCharacterId() {
+    return localStorage.getItem(CURRENT_CHARACTER_KEY);
+}
+
+// Definir personagem atual
+function setCurrentCharacter(charId) {
+    localStorage.setItem(CURRENT_CHARACTER_KEY, charId);
+}
+
+// Selecionar personagem
+function selectCharacter(charId) {
+    const char = getCharacterById(charId);
     
-    mostrarNotificacao(`Personagem trocado para: ${char.name}`, 'success');
+    if (!char) {
+        mostrarNotificacao('❌ Personagem não encontrado', 'error');
+        return;
+    }
+    
+    const confirmar = confirm(
+        `Mudar para o personagem "${char.name}"?\n\n` +
+        'A página será recarregada para carregar os dados do personagem.'
+    );
+    
+    if (!confirmar) return;
+    
+    setCurrentCharacter(charId);
+    mostrarNotificacao(`✅ Personagem "${char.name}" selecionado!`, 'success');
     
     // Redireciona para a ficha
     setTimeout(() => {
@@ -183,220 +205,195 @@ function switchCharacter(charId) {
     }, 1000);
 }
 
-// Compartilhar personagem
-function shareCharacter(charId) {
-    const characters = getCharacters();
-    const char = characters.find(c => c.id === charId);
-    
-    if (!char) return;
-    
-    // Cria um objeto compartilhável
-    const shareData = {
-        version: '1.0',
-        character: {
-            name: char.name,
-            class: char.class,
-            level: char.level,
-            data: char.data
-        },
-        exported: new Date().toISOString()
-    };
-    
-    const jsonString = JSON.stringify(shareData);
-    const base64 = btoa(encodeURIComponent(jsonString));
-    
-    // Cria URL compartilhável (você pode usar um serviço de URL curta aqui)
-    const shareUrl = `${window.location.origin}${window.location.pathname.replace('personagens.html', 'import.html')}?data=${base64}`;
-    
-    // Modal de compartilhamento
-    const modal = document.createElement('div');
-    modal.className = 'share-modal';
-    modal.innerHTML = `
-        <div class="share-modal-content">
-            <h3>🔗 Compartilhar ${char.name}</h3>
-            <p>Copie o link abaixo para compartilhar este personagem:</p>
-            <div class="share-link-container">
-                <input type="text" readonly value="${shareUrl}" id="share-link">
-                <button class="copy-btn" id="copy-share-link">📋 Copiar</button>
-            </div>
-            <p class="share-tip">💡 Qualquer pessoa com este link poderá importar uma cópia deste personagem.</p>
-            <button class="confirm-cancel" id="close-share">Fechar</button>
-        </div>
-    `;
-    
-    document.body.appendChild(modal);
-    
-    // Seleciona o texto automaticamente
-    const linkInput = document.getElementById('share-link');
-    linkInput.select();
-    
-    // Copiar para clipboard
-    document.getElementById('copy-share-link').addEventListener('click', () => {
-        linkInput.select();
-        document.execCommand('copy');
-        mostrarNotificacao('Link copiado!', 'success');
-    });
-    
-    // Fechar modal
-    document.getElementById('close-share').addEventListener('click', () => {
-        modal.remove();
-    });
-    
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) modal.remove();
-    });
-}
+// =====================================================
+// MODAL DE CRIAR/EDITAR
+// =====================================================
 
-// Exportar personagem individual
-function exportCharacter(charId) {
-    const characters = getCharacters();
-    const char = characters.find(c => c.id === charId);
-    
-    if (!char) return;
-    
-    const exportData = {
-        version: '1.0',
-        character: char,
-        exported: new Date().toISOString()
-    };
-    
-    const jsonString = JSON.stringify(exportData, null, 2);
-    const blob = new Blob([jsonString], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${char.name.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    
-    mostrarNotificacao('Personagem exportado!', 'success');
-}
+let editingCharId = null;
 
-// Deletar personagem
-function deleteCharacter(charId) {
-    const characters = getCharacters();
-    const char = characters.find(c => c.id === charId);
-    const currentId = getCurrentCharacterId();
+function openCharacterModal(charId = null) {
+    const modal = document.getElementById('character-modal');
+    const title = document.getElementById('modal-title');
+    const nameInput = document.getElementById('char-name');
+    const classInput = document.getElementById('char-class');
+    const levelInput = document.getElementById('char-level');
     
-    if (!char) return;
+    if (!modal) return;
     
-    const modal = document.createElement('div');
-    modal.className = 'confirm-modal';
-    modal.innerHTML = `
-        <div class="confirm-modal-content">
-            <h3>⚠️ Deletar Personagem</h3>
-            <p>Tem certeza que deseja deletar <strong>${escapeHtml(char.name)}</strong>?</p>
-            <p class="confirm-warning">Esta ação é irreversível!</p>
-            <div class="confirm-buttons">
-                <button class="confirm-cancel" id="cancel-delete">Cancelar</button>
-                <button class="confirm-delete" id="confirm-delete">Sim, Deletar</button>
-            </div>
-        </div>
-    `;
+    editingCharId = charId;
     
-    document.body.appendChild(modal);
-    
-    document.getElementById('cancel-delete').addEventListener('click', () => modal.remove());
-    
-    document.getElementById('confirm-delete').addEventListener('click', () => {
-        const updatedChars = characters.filter(c => c.id !== charId);
-        saveCharacters(updatedChars);
+    if (charId) {
+        // Modo edição
+        const char = getCharacterById(charId);
+        if (!char) return;
         
-        // Se deletou o personagem atual, limpa a seleção
-        if (charId === currentId) {
-            localStorage.removeItem(CURRENT_CHAR_KEY);
-            // Limpa os dados também
-            const keysToRemove = [];
-            for (let i = 0; i < localStorage.length; i++) {
-                const key = localStorage.key(i);
-                if (key && key.startsWith('umbrantium-') && 
-                    !key.includes('characters') && 
-                    !key.includes('current-character') &&
-                    !key.includes('theme')) {
-                    keysToRemove.push(key);
-                }
-            }
-            keysToRemove.forEach(k => localStorage.removeItem(k));
-        }
-        
-        modal.remove();
-        mostrarNotificacao('Personagem deletado', 'success');
-        renderCharacters();
-    });
-    
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) modal.remove();
-    });
-}
-
-// Inicialização
-if (window.location.pathname.includes('personagens.html')) {
-    document.addEventListener('DOMContentLoaded', () => {
-        renderCharacters();
-        
-        // Modal de criar personagem
-        const createBtn = document.getElementById('create-character');
-        const modal = document.getElementById('character-modal');
-        const form = document.getElementById('character-form');
-        const cancelBtn = document.getElementById('cancel-char');
-        
-        if (createBtn) {
-            createBtn.addEventListener('click', () => {
-                modal.style.display = 'flex';
-            });
-        }
-        
-        if (cancelBtn) {
-            cancelBtn.addEventListener('click', () => {
-                modal.style.display = 'none';
-                form.reset();
-            });
-        }
-        
-        if (form) {
-            form.addEventListener('submit', (e) => {
-                e.preventDefault();
-                
-                const name = document.getElementById('char-name').value.trim();
-                const charClass = document.getElementById('char-class').value.trim();
-                const level = parseInt(document.getElementById('char-level').value) || 1;
-                
-                if (!name) {
-                    alert('Nome é obrigatório!');
-                    return;
-                }
-                
-                createCharacter(name, charClass, level);
-                modal.style.display = 'none';
-                form.reset();
-                renderCharacters();
-                mostrarNotificacao('Personagem criado!', 'success');
-            });
-        }
-        
-        // Fechar modal ao clicar fora
-        if (modal) {
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    modal.style.display = 'none';
-                    form.reset();
-                }
-            });
-        }
-    });
-}
-
-// Auto-salvar personagem atual ao navegar
-window.addEventListener('beforeunload', () => {
-    const currentId = getCurrentCharacterId();
-    if (currentId) {
-        const characters = getCharacters();
-        const currentChar = characters.find(c => c.id === currentId);
-        if (currentChar) {
-            currentChar.data = collectCharacterData();
-            saveCharacters(characters);
-        }
+        title.textContent = 'Editar Personagem';
+        nameInput.value = char.name;
+        classInput.value = char.class || '';
+        levelInput.value = char.level || '1';
+    } else {
+        // Modo criação
+        title.textContent = 'Novo Personagem';
+        nameInput.value = '';
+        classInput.value = '';
+        levelInput.value = '1';
     }
+    
+    modal.style.display = 'flex';
+    setTimeout(() => nameInput.focus(), 100);
+}
+
+function closeCharacterModal() {
+    const modal = document.getElementById('character-modal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+    editingCharId = null;
+}
+
+function handleCharacterFormSubmit(e) {
+    e.preventDefault();
+    
+    const nameInput = document.getElementById('char-name');
+    const classInput = document.getElementById('char-class');
+    const levelInput = document.getElementById('char-level');
+    
+    const name = nameInput.value.trim();
+    const charClass = classInput.value.trim();
+    const level = levelInput.value.trim();
+    
+    if (!name) {
+        mostrarNotificacao('❌ Nome é obrigatório', 'error');
+        return;
+    }
+    
+    if (editingCharId) {
+        // Atualizar personagem existente
+        updateCharacter(editingCharId, {
+            name: name,
+            class: charClass,
+            level: level
+        });
+        
+        // Se é o personagem ativo, atualiza os campos na ficha também
+        if (editingCharId === getCurrentCharacterId()) {
+            const prefix = `umbrantium-${editingCharId}-`;
+            localStorage.setItem(prefix + 'personagem', name);
+            localStorage.setItem(prefix + 'classe', charClass);
+            localStorage.setItem(prefix + 'nivel', level);
+        }
+        
+        mostrarNotificacao('✅ Personagem atualizado!', 'success');
+    } else {
+        // Criar novo personagem
+        const newChar = createNewCharacter(name, charClass, level);
+        
+        // Se é o primeiro personagem, define como ativo automaticamente
+        const characters = getAllCharacters();
+        if (characters.length === 1) {
+            setCurrentCharacter(newChar.id);
+        }
+        
+        mostrarNotificacao('✅ Personagem criado!', 'success');
+    }
+    
+    closeCharacterModal();
+    loadCharactersList();
+}
+
+function editCharacter(charId) {
+    openCharacterModal(charId);
+}
+
+function deleteCharacter(charId) {
+    const char = getCharacterById(charId);
+    
+    if (!char) {
+        mostrarNotificacao('❌ Personagem não encontrado', 'error');
+        return;
+    }
+    
+    const currentCharId = getCurrentCharacterId();
+    
+    if (charId === currentCharId) {
+        mostrarNotificacao('❌ Não é possível excluir o personagem ativo. Selecione outro primeiro.', 'error');
+        return;
+    }
+    
+    const confirmar = confirm(
+        `Excluir o personagem "${char.name}"?\n\n` +
+        '⚠️ ATENÇÃO: Todos os dados deste personagem serão perdidos!\n' +
+        'Esta ação NÃO pode ser desfeita!'
+    );
+    
+    if (!confirmar) return;
+    
+    // Confirmação dupla para segurança
+    const confirmar2 = confirm(
+        `Tem CERTEZA que deseja excluir "${char.name}"?\n\n` +
+        'Digite OK para confirmar'
+    );
+    
+    if (!confirmar2) return;
+    
+    if (deleteCharacterById(charId)) {
+        mostrarNotificacao(`✅ Personagem "${char.name}" excluído`, 'success');
+        loadCharactersList();
+    } else {
+        mostrarNotificacao('❌ Erro ao excluir personagem', 'error');
+    }
+}
+
+// =====================================================
+// EVENT LISTENERS
+// =====================================================
+
+function setupEventListeners() {
+    const createBtn = document.getElementById('create-character');
+    const cancelBtn = document.getElementById('cancel-char');
+    const form = document.getElementById('character-form');
+    const modal = document.getElementById('character-modal');
+    
+    if (createBtn) {
+        createBtn.addEventListener('click', () => openCharacterModal());
+    }
+    
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', closeCharacterModal);
+    }
+    
+    if (form) {
+        form.addEventListener('submit', handleCharacterFormSubmit);
+    }
+    
+    if (modal) {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeCharacterModal();
+            }
+        });
+    }
+}
+
+// =====================================================
+// UTILITÁRIOS
+// =====================================================
+
+function generateId() {
+    return 'char_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+}
+
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// =====================================================
+// INICIALIZAÇÃO
+// =====================================================
+
+document.addEventListener('DOMContentLoaded', () => {
+    initCharacterSystem();
 });

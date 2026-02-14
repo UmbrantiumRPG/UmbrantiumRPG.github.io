@@ -26,6 +26,52 @@ function setTheme(theme) {
     localStorage.setItem(THEME_KEY, theme);
 }
 
+// =====================================================
+// SISTEMA DE MÚLTIPLOS PERSONAGENS - PREFIXO DINÂMICO
+// =====================================================
+
+const CHARACTERS_LIST_KEY = 'umbrantium-characters-list';
+const CURRENT_CHARACTER_KEY = 'umbrantium-current-character';
+
+// Obtém ou cria personagem atual
+function getCurrentCharacterId() {
+    let currentId = localStorage.getItem(CURRENT_CHARACTER_KEY);
+    
+    // Se não há personagem atual, verifica se há personagens
+    if (!currentId) {
+        const charactersData = localStorage.getItem(CHARACTERS_LIST_KEY);
+        const characters = charactersData ? JSON.parse(charactersData) : [];
+        
+        if (characters.length > 0) {
+            // Usa o primeiro personagem
+            currentId = characters[0].id;
+            localStorage.setItem(CURRENT_CHARACTER_KEY, currentId);
+        } else {
+            // Cria um personagem padrão
+            currentId = createDefaultCharacter();
+        }
+    }
+    
+    return currentId;
+}
+
+// Cria um personagem padrão
+function createDefaultCharacter() {
+    const defaultChar = {
+        id: 'char_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+        name: 'Aventureiro',
+        class: '',
+        level: '1',
+        created: new Date().toISOString()
+    };
+    
+    const characters = [defaultChar];
+    localStorage.setItem(CHARACTERS_LIST_KEY, JSON.stringify(characters));
+    localStorage.setItem(CURRENT_CHARACTER_KEY, defaultChar.id);
+    
+    return defaultChar.id;
+}
+
 // --- Detecta a página pelo nome do arquivo ---
 const pageKey = (() => {
     const path = location.pathname.split('/').pop();
@@ -33,8 +79,9 @@ const pageKey = (() => {
     return path.replace('.html', '');
 })();
 
-// Prefixo único por página
-const prefix = 'umbrantium-' + pageKey + '-';
+// Prefixo único por personagem e página
+const currentCharacterId = getCurrentCharacterId();
+const prefix = 'umbrantium-' + currentCharacterId + '-' + pageKey + '-';
 
 
 
@@ -389,23 +436,33 @@ function abrirModalExportacao() {
     const existente = document.querySelector('.export-modal');
     if (existente) existente.remove();
     
-    // Coleta todos os dados
+    // Coleta apenas os dados do personagem atual
+    const charId = getCurrentCharacterId();
+    const charPrefix = `umbrantium-${charId}-`;
     const dados = {};
+    
+    // Coleta dados do personagem atual
     for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        if (key.startsWith('umbrantium-')) {
+        if (key && key.startsWith(charPrefix)) {
             dados[key] = localStorage.getItem(key);
         }
     }
     
+    // Obtém informações do personagem
+    const charactersData = localStorage.getItem(CHARACTERS_LIST_KEY);
+    const characters = charactersData ? JSON.parse(charactersData) : [];
+    const currentChar = characters.find(c => c.id === charId);
+    
     const fichaData = {
-        versao: '1.0',
+        versao: '1.1',
         dataExportacao: new Date().toISOString(),
+        characterInfo: currentChar || { id: charId, name: 'Personagem', class: '', level: '1' },
         dados: dados
     };
     
     const jsonString = JSON.stringify(fichaData);
-    const nomePersonagem = localStorage.getItem('umbrantium-index-personagem') || 'Ficha';
+    const nomePersonagem = currentChar?.name || 'Personagem';
     
     // Comprime usando LZ-String
     let compressed;
@@ -437,7 +494,7 @@ function abrirModalExportacao() {
         <div class="export-modal-content">
             <button class="export-close" title="Fechar">×</button>
             <h2>🚀 Exportar Ficha</h2>
-            <p class="export-subtitle">Escolha como compartilhar</p>
+            <p class="export-subtitle">Personagem: <strong>${escapeHtml(nomePersonagem)}</strong></p>
             
             <div class="export-info">
                 <span>📊 Tamanho: <strong>${(tamanhoBruto/1024).toFixed(1)}KB</strong> → <strong>${(tamanhoComprimido/1024).toFixed(1)}KB</strong></span>
@@ -581,17 +638,27 @@ function baixarQRCode() {
 }
 
 function exportarJSON() {
+    // Coleta apenas os dados do personagem atual
+    const charId = getCurrentCharacterId();
+    const charPrefix = `umbrantium-${charId}-`;
     const dados = {};
+    
     for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        if (key.startsWith('umbrantium-')) {
+        if (key && key.startsWith(charPrefix)) {
             dados[key] = localStorage.getItem(key);
         }
     }
     
+    // Obtém informações do personagem
+    const charactersData = localStorage.getItem(CHARACTERS_LIST_KEY);
+    const characters = charactersData ? JSON.parse(charactersData) : [];
+    const currentChar = characters.find(c => c.id === charId);
+    
     const fichaData = {
-        versao: '1.0',
+        versao: '1.1',
         dataExportacao: new Date().toISOString(),
+        characterInfo: currentChar || { id: charId, name: 'Personagem', class: '', level: '1' },
         dados: dados
     };
     
@@ -600,7 +667,7 @@ function exportarJSON() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     
-    const nomePersonagem = localStorage.getItem('umbrantium-index-personagem') || 'Ficha';
+    const nomePersonagem = currentChar?.name || 'Personagem';
     const dataFormatada = new Date().toISOString().split('T')[0];
     a.href = url;
     a.download = `${nomePersonagem}_${dataFormatada}.json`;
@@ -732,37 +799,75 @@ function processarImportacaoDeCodigo() {
 }
 
 function processarImportacao(fichaData) {
-    // Confirmação antes de sobrescrever
-    const nomeNovo = fichaData.dados['umbrantium-index-personagem'] || 'Ficha Importada';
+    // Extrai informações do personagem
+    let characterInfo = fichaData.characterInfo;
+    let nomeNovo = 'Personagem Importado';
+    let classeNova = '';
+    let nivelNovo = '1';
+    
+    // Compatibilidade com formato antigo (versão 1.0)
+    if (!characterInfo) {
+        // Tenta extrair do primeiro dado encontrado
+        const primeiraChave = Object.keys(fichaData.dados)[0];
+        if (primeiraChave) {
+            const match = primeiraChave.match(/umbrantium-(.+?)-index-personagem/);
+            if (match) {
+                nomeNovo = fichaData.dados[primeiraChave] || nomeNovo;
+            }
+        }
+    } else {
+        nomeNovo = characterInfo.name || nomeNovo;
+        classeNova = characterInfo.class || '';
+        nivelNovo = characterInfo.level || '1';
+    }
+    
     const confirmar = confirm(
-        `Importar "${nomeNovo}"?\n\n` +
-        'ATENÇÃO: Isso irá sobrescrever todos os dados atuais!\n\n' +
-        'Dica: Exporte sua ficha atual primeiro como backup!'
+        `Importar personagem "${nomeNovo}"?\n\n` +
+        '✨ Um NOVO personagem será criado.\n' +
+        '✅ Seus personagens atuais NÃO serão afetados.\n\n' +
+        'Deseja continuar?'
     );
     
     if (!confirmar) return;
     
     try {
-        // Limpa dados antigos do Umbrantium
-        const keysParaRemover = [];
-        for (let i = 0; i < localStorage.length; i++) {
-            const key = localStorage.key(i);
-            if (key && key.startsWith('umbrantium-')) {
-                keysParaRemover.push(key);
-            }
-        }
-        keysParaRemover.forEach(key => localStorage.removeItem(key));
+        // Cria um novo personagem
+        const novoId = 'char_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        const novoChar = {
+            id: novoId,
+            name: nomeNovo,
+            class: classeNova,
+            level: nivelNovo,
+            created: new Date().toISOString()
+        };
         
-        // Importa novos dados
+        // Adiciona à lista de personagens
+        const charactersData = localStorage.getItem(CHARACTERS_LIST_KEY);
+        const characters = charactersData ? JSON.parse(charactersData) : [];
+        characters.push(novoChar);
+        localStorage.setItem(CHARACTERS_LIST_KEY, JSON.stringify(characters));
+        
+        // Importa os dados com o novo prefixo
+        const novoPrefix = `umbrantium-${novoId}-`;
+        
         Object.keys(fichaData.dados).forEach(key => {
-            localStorage.setItem(key, fichaData.dados[key]);
+            // Remove o prefixo antigo e adiciona o novo
+            const keyParts = key.split('-');
+            // Remove 'umbrantium' e o ID antigo
+            const newKeyParts = keyParts.slice(2); // Pega só a parte depois do ID
+            const newKey = novoPrefix + newKeyParts.join('-');
+            
+            localStorage.setItem(newKey, fichaData.dados[key]);
         });
         
-        mostrarNotificacao('✅ Ficha importada com sucesso! Recarregando...', 'success');
+        // Define como personagem ativo
+        localStorage.setItem(CURRENT_CHARACTER_KEY, novoId);
+        
+        mostrarNotificacao(`✅ Personagem "${nomeNovo}" importado! Recarregando...`, 'success');
         
         // Recarrega a página após 1.5 segundos
         setTimeout(() => {
-            location.reload();
+            window.location.href = 'index.html';
         }, 1500);
         
     } catch (erro) {
@@ -814,16 +919,34 @@ function mostrarConfirmacaoImportacao(fichaData) {
     const existente = document.querySelector('.auto-import-modal');
     if (existente) existente.remove();
     
-    const nomePersonagem = fichaData.dados['umbrantium-index-personagem'] || 'Personagem';
-    const classe = fichaData.dados['umbrantium-index-classe'] || '';
-    const nivel = fichaData.dados['umbrantium-index-nivel'] || '';
+    // Usa characterInfo se disponível (formato 1.1), senão tenta extrair dos dados (formato 1.0)
+    let nomePersonagem, classe, nivel;
+    
+    if (fichaData.characterInfo) {
+        nomePersonagem = fichaData.characterInfo.name || 'Personagem';
+        classe = fichaData.characterInfo.class || '';
+        nivel = fichaData.characterInfo.level || '';
+    } else {
+        // Formato antigo - tenta extrair dos dados
+        const primeiraChave = Object.keys(fichaData.dados)[0];
+        if (primeiraChave) {
+            const basePrefix = primeiraChave.split('-').slice(0, 2).join('-');
+            nomePersonagem = fichaData.dados[`${basePrefix}-index-personagem`] || 'Personagem';
+            classe = fichaData.dados[`${basePrefix}-index-classe`] || '';
+            nivel = fichaData.dados[`${basePrefix}-index-nivel`] || '';
+        } else {
+            nomePersonagem = 'Personagem';
+            classe = '';
+            nivel = '';
+        }
+    }
     
     const modal = document.createElement('div');
     modal.className = 'auto-import-modal';
     modal.innerHTML = `
         <div class="auto-import-content">
             <div class="auto-import-icon">📥</div>
-            <h2>Importar Ficha Recebida?</h2>
+            <h2>Importar Personagem?</h2>
             
             <div class="auto-import-info">
                 <p><strong>Nome:</strong> ${escapeHtml(nomePersonagem)}</p>
@@ -831,8 +954,9 @@ function mostrarConfirmacaoImportacao(fichaData) {
                 ${nivel ? `<p><strong>Nível:</strong> ${escapeHtml(nivel)}</p>` : ''}
             </div>
             
-            <p class="auto-import-warning">
-                ⚠️ Isso substituirá todos os dados atuais no seu navegador!
+            <p class="auto-import-warning" style="background: rgba(95, 184, 95, 0.1); color: #5fb85f; border-color: rgba(95, 184, 95, 0.3);">
+                ✨ Um novo personagem será criado.<br>
+                Seus personagens atuais não serão afetados.
             </p>
             
             <div class="auto-import-actions">
@@ -840,7 +964,7 @@ function mostrarConfirmacaoImportacao(fichaData) {
                     Cancelar
                 </button>
                 <button class="auto-import-confirm" id="confirm-auto-import">
-                    ✅ Sim, Importar
+                    ✅ Importar como Novo
                 </button>
             </div>
         </div>
