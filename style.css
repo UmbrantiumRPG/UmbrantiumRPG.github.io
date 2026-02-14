@@ -2372,3 +2372,507 @@ button.remove:hover {
         padding: 20px;
     }
 }
+
+/* ===============================================
+   MELHORIAS MOBILE - PERSONAGENS E GERAL
+   =============================================== */
+
+/* Mobile: 600px e abaixo */
+@media (max-width: 600px) {
+    
+    /* === LAYOUT GERAL === */
+    .app {
+        flex-direction: column;
+    }
+    
+    .content {
+        padding: 15px 10px;
+        margin-left: 0;
+    }
+    
+    /* === SIDEBAR === */
+    .sidebar {
+        position: fixed;
+        left: -280px;
+        transition: left 0.3s ease;
+        z-index: 9999;
+        height: 100vh;
+        width: 280px;
+    }
+    
+    .sidebar.open {
+        left: 0;
+        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.5);
+    }
+    
+    .toggle {
+        display: flex !important;
+        position: fixed;
+        top: 15px;
+        left: 15px;
+        z-index: 10000;
+        background: var(--accent);
+        color: white;
+        border: none;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* === HEADERS === */
+    .top-header {
+        padding: 60px 15px 20px 15px;
+        text-align: center;
+    }
+    
+    .top-header h1 {
+        font-size: 24px;
+        margin-bottom: 8px;
+    }
+    
+    .subtitle {
+        font-size: 13px;
+    }
+    
+    /* === PANELS === */
+    .panel {
+        padding: 20px 15px;
+        margin-bottom: 15px;
+        border-radius: 10px;
+    }
+    
+    .characters-panel {
+        padding: 20px 12px;
+    }
+    
+    /* === CHARACTERS HEADER === */
+    .characters-header {
+        flex-direction: column;
+        gap: 15px;
+        margin-bottom: 20px;
+        align-items: stretch;
+    }
+    
+    .characters-header h2 {
+        font-size: 20px;
+        text-align: center;
+        margin: 0;
+    }
+    
+    .characters-header .add-btn {
+        width: 100%;
+        padding: 14px 20px;
+        font-size: 16px;
+        border-radius: 10px;
+    }
+    
+    /* === CHARACTER CARDS === */
+    .characters-grid {
+        grid-template-columns: 1fr !important;
+        gap: 15px;
+        padding: 0;
+    }
+    
+    .character-card {
+        padding: 20px 16px;
+        border-radius: 12px;
+    }
+    
+    .character-card h3 {
+        font-size: 20px;
+        margin-bottom: 10px;
+    }
+    
+    .character-details {
+        flex-direction: column;
+        gap: 8px;
+        align-items: flex-start;
+    }
+    
+    .character-details span {
+        padding: 6px 12px;
+        font-size: 13px;
+        width: fit-content;
+    }
+    
+    .character-date {
+        font-size: 11px;
+        margin-top: 8px;
+    }
+    
+    /* === CHARACTER ACTIONS === */
+    .character-actions {
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 18px;
+    }
+    
+    .char-btn {
+        width: 100% !important;
+        padding: 12px 16px !important;
+        font-size: 15px;
+        border-radius: 8px;
+    }
+    
+    .char-btn-select {
+        order: 1;
+    }
+    
+    .char-btn-edit {
+        order: 2;
+    }
+    
+    .char-btn-delete {
+        order: 3;
+    }
+    
+    /* === ACTIVE BADGE === */
+    .active-badge {
+        top: 12px;
+        right: 12px;
+        padding: 5px 12px;
+        font-size: 11px;
+    }
+    
+    /* === MODALS === */
+    .character-modal,
+    .export-modal,
+    .import-modal,
+    .auto-import-modal {
+        padding: 0;
+        align-items: stretch;
+    }
+    
+    .character-modal-content,
+    .export-modal-content,
+    .import-modal-content,
+    .auto-import-content {
+        max-width: 100%;
+        width: 100%;
+        max-height: 100vh;
+        height: 100%;
+        margin: 0;
+        border-radius: 0;
+        padding: 20px 15px;
+        overflow-y: auto;
+    }
+    
+    .character-modal-content h3,
+    .export-modal-content h2,
+    .import-modal-content h2,
+    .auto-import-content h2 {
+        font-size: 22px;
+        margin-top: 40px;
+    }
+    
+    /* === FORM INPUTS === */
+    .character-modal-content label {
+        margin-bottom: 18px;
+    }
+    
+    .character-modal-content label input {
+        padding: 14px 12px;
+        font-size: 16px;
+        border-radius: 8px;
+    }
+    
+    /* === MODAL BUTTONS === */
+    .modal-buttons {
+        flex-direction: column-reverse;
+        gap: 12px;
+        margin-top: 25px;
+    }
+    
+    .confirm-cancel,
+    .confirm-save {
+        width: 100%;
+        padding: 14px 20px;
+        font-size: 16px;
+        border-radius: 10px;
+    }
+    
+    /* === EXPORT MODAL === */
+    .export-section {
+        padding: 18px 15px;
+        margin-bottom: 18px;
+    }
+    
+    .export-section h3 {
+        font-size: 18px;
+        margin-bottom: 12px;
+    }
+    
+    .qr-container {
+        padding: 15px;
+        margin: 15px auto;
+        display: flex;
+        justify-content: center;
+    }
+    
+    .qr-container canvas,
+    .qr-container img {
+        max-width: 100%;
+        height: auto !important;
+        width: 100% !important;
+        max-width: 250px;
+    }
+    
+    .export-link-box input,
+    .export-text-box textarea {
+        font-size: 12px;
+        padding: 12px;
+    }
+    
+    .export-text-box textarea {
+        min-height: 120px;
+    }
+    
+    .export-action-btn {
+        padding: 14px 20px;
+        font-size: 15px;
+        border-radius: 10px;
+    }
+    
+    .export-info {
+        flex-direction: column;
+        gap: 8px;
+        padding: 12px;
+        font-size: 13px;
+    }
+    
+    .export-close,
+    .import-close {
+        top: 10px;
+        right: 10px;
+        width: 40px;
+        height: 40px;
+        font-size: 30px;
+    }
+    
+    /* === IMPORT MODAL === */
+    .import-section textarea {
+        min-height: 180px;
+        font-size: 13px;
+        padding: 12px;
+    }
+    
+    .import-actions {
+        flex-direction: column-reverse;
+        gap: 12px;
+    }
+    
+    .import-btn-cancel,
+    .import-btn-confirm,
+    .import-btn-file {
+        padding: 14px 20px;
+        font-size: 15px;
+    }
+    
+    /* === AUTO IMPORT MODAL === */
+    .auto-import-content {
+        padding: 30px 20px;
+        border-radius: 20px 20px 0 0;
+        height: auto;
+        max-height: 90vh;
+    }
+    
+    .auto-import-icon {
+        font-size: 56px;
+        margin-bottom: 18px;
+    }
+    
+    .auto-import-content h2 {
+        font-size: 24px;
+        margin-top: 0;
+    }
+    
+    .auto-import-info {
+        padding: 18px 15px;
+    }
+    
+    .auto-import-info p {
+        font-size: 14px;
+    }
+    
+    .auto-import-actions {
+        flex-direction: column-reverse;
+        gap: 12px;
+        margin-top: 22px;
+    }
+    
+    .auto-import-cancel,
+    .auto-import-confirm {
+        padding: 14px 20px;
+        font-size: 16px;
+    }
+    
+    /* === EMPTY STATE === */
+    .empty-state {
+        padding: 40px 20px;
+    }
+    
+    .empty-icon {
+        font-size: 64px;
+    }
+    
+    .empty-state h3 {
+        font-size: 20px;
+    }
+    
+    .empty-state p {
+        font-size: 14px;
+    }
+    
+    /* === FOOTER === */
+    .footer {
+        padding: 15px;
+        font-size: 12px;
+        text-align: center;
+    }
+    
+    /* === BOTÕES GERAIS === */
+    .add-btn,
+    .sidebar-btn {
+        padding: 12px 18px;
+        font-size: 15px;
+        border-radius: 8px;
+        min-height: 44px;
+    }
+    
+    /* === SIDEBAR EXPORT === */
+    .sidebar-export {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .sidebar-export button {
+        width: 100%;
+        padding: 12px;
+    }
+    
+    /* === SIDEBAR THEME === */
+    .sidebar-theme {
+        margin-top: 20px;
+    }
+    
+    .theme-select {
+        padding: 10px;
+        font-size: 14px;
+    }
+}
+
+/* Tablets: 601px a 900px */
+@media (min-width: 601px) and (max-width: 900px) {
+    
+    .characters-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 15px;
+    }
+    
+    .content {
+        padding: 20px 25px;
+    }
+    
+    .top-header h1 {
+        font-size: 28px;
+    }
+    
+    .character-card {
+        padding: 20px;
+    }
+    
+    .character-actions {
+        flex-wrap: wrap;
+    }
+    
+    .char-btn-select {
+        flex: 1 1 100%;
+    }
+    
+    .char-btn-edit,
+    .char-btn-delete {
+        flex: 1;
+    }
+    
+    /* Modais um pouco menores */
+    .character-modal-content,
+    .export-modal-content,
+    .import-modal-content {
+        max-width: 90%;
+        padding: 30px 25px;
+    }
+}
+
+/* Landscape mobile */
+@media (max-width: 900px) and (orientation: landscape) {
+    
+    .character-modal-content,
+    .export-modal-content,
+    .import-modal-content {
+        max-height: 95vh;
+        overflow-y: auto;
+    }
+    
+    .top-header {
+        padding-top: 70px;
+    }
+}
+
+/* Touch improvements */
+@media (hover: none) and (pointer: coarse) {
+    
+    /* Aumenta área de toque */
+    button,
+    .char-btn,
+    .add-btn,
+    a {
+        min-height: 44px;
+        min-width: 44px;
+    }
+    
+    /* Remove hover effects em touch */
+    .character-card:hover {
+        transform: none;
+    }
+    
+    /* Feedback visual ao tocar */
+    .character-card:active {
+        transform: scale(0.98);
+        opacity: 0.9;
+    }
+    
+    button:active,
+    .char-btn:active {
+        transform: scale(0.95);
+    }
+}
+
+/* Small phones: abaixo de 360px */
+@media (max-width: 360px) {
+    
+    .top-header h1 {
+        font-size: 20px;
+    }
+    
+    .character-card {
+        padding: 16px 12px;
+    }
+    
+    .character-card h3 {
+        font-size: 18px;
+    }
+    S
+    .export-modal-content,
+    .import-modal-content {
+        padding: 15px 12px;
+    }
+    
+    .qr-container canvas,
+    .qr-container img {
+        max-width: 200px !important;
+    }
+}
