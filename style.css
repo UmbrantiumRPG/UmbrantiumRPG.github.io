@@ -2865,7 +2865,7 @@ button.remove:hover {
     .character-card h3 {
         font-size: 18px;
     }
-    S
+    
     .export-modal-content,
     .import-modal-content {
         padding: 15px 12px;
@@ -2874,5 +2874,190 @@ button.remove:hover {
     .qr-container canvas,
     .qr-container img {
         max-width: 200px !important;
+    }
+}
+
+/* ===============================================
+   CORREÇÕES MOBILE - PERÍCIAS E EQUIPAMENTOS
+   =============================================== */
+
+/* Mobile: Perícias em 1 coluna */
+@media (max-width: 600px) {
+    
+    /* === PERÍCIAS - 1 COLUNA === */
+    .pericias-grid {
+        grid-template-columns: 1fr !important;
+        gap: 10px;
+    }
+    
+    .pericia {
+        grid-template-columns: 120px 1fr;
+        padding: 10px;
+    }
+    
+    .pericia label {
+        font-size: 13px;
+    }
+    
+    .pericia input {
+        font-size: 14px;
+        padding: 8px;
+    }
+    
+    /* === EQUIPAMENTOS - AJUSTE DE POSICIONAMENTO === */
+    .character-equipment {
+        height: 650px;
+        padding: 20px 10px;
+    }
+    
+    .character-silhouette {
+        width: 80%;
+        height: 100%;
+        object-fit: contain;
+        opacity: 0.4;
+    }
+    
+    .equipment-slots {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90%;
+        max-width: 300px;
+        height: 100%;
+    }
+    
+    .equip-slot {
+        width: 100%;
+        max-width: 180px;
+        left: 50% !important;
+        transform: translateX(-50%);
+    }
+    
+    /* Ajuste de posições específicas para mobile */
+    .slot-head {
+        top: 40px !important;
+    }
+    
+    .slot-chest {
+        top: 180px !important;
+    }
+    
+    .slot-hands {
+        top: 260px !important;
+    }
+    
+    .slot-legs {
+        top: 400px !important;
+    }
+    
+    .slot-feet {
+        top: 550px !important;
+    }
+    
+    .equip-slot label {
+        font-size: 10px;
+        margin-bottom: 3px;
+    }
+    
+    .equip-slot input {
+        padding: 8px 6px;
+        font-size: 12px;
+    }
+    
+    /* === LAYOUT HABILIDADES === */
+    .habilidades-layout {
+        grid-template-columns: 1fr !important;
+        gap: 20px;
+    }
+    
+    .habilidades-left,
+    .habilidades-right {
+        width: 100%;
+    }
+    
+    .habilidades-panel,
+    .equipamentos-panel {
+        padding: 20px 15px;
+    }
+}
+
+/* Tablets: 601px a 900px - Ajustes menores */
+@media (min-width: 601px) and (max-width: 900px) {
+    
+    /* Perícias ainda em 2 colunas no tablet */
+    .pericias-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+    
+    /* Equipamentos ajustados para tablet */
+    .character-equipment {
+        height: 550px;
+    }
+    
+    .character-silhouette {
+        width: 90%;
+        opacity: 0.5;
+    }
+    
+    .equip-slot {
+        width: 160px;
+    }
+    
+    .slot-head {
+        top: 45px !important;
+    }
+    
+    .slot-chest {
+        top: 190px !important;
+    }
+    
+    .slot-hands {
+        top: 270px !important;
+    }
+    
+    .slot-legs {
+        top: 400px !important;
+    }
+    
+    .slot-feet {
+        top: 520px !important;
+    }
+}
+
+/* Landscape mobile - Equipamentos mais compactos */
+@media (max-width: 900px) and (orientation: landscape) {
+    
+    .character-equipment {
+        height: 500px;
+    }
+    
+    .slot-head { top: 35px !important; }
+    .slot-chest { top: 150px !important; }
+    .slot-hands { top: 220px !important; }
+    .slot-legs { top: 330px !important; }
+    .slot-feet { top: 440px !important; }
+}
+
+/* Small phones - Equipamentos ainda mais compactos */
+@media (max-width: 360px) {
+    
+    .character-equipment {
+        height: 600px;
+        padding: 15px 5px;
+    }
+    
+    .equipment-slots {
+        max-width: 280px;
+    }
+    
+    .equip-slot {
+        max-width: 160px;
+    }
+    
+    .equip-slot input {
+        font-size: 11px;
+        padding: 6px 4px;
     }
 }
