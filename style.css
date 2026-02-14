@@ -1565,3 +1565,614 @@ button.remove:hover {
         font-size: 11px;
     }
 }
+/* ===============================================
+   MODAIS DE EXPORTAÇÃO E IMPORTAÇÃO COM QR CODE
+   =============================================== */
+
+/* Modal de Exportação */
+.export-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    padding: 20px;
+    animation: fadeIn 0.2s ease;
+}
+
+.export-modal-content {
+    background: var(--panel);
+    border: 2px solid var(--accent);
+    border-radius: var(--radius);
+    padding: 30px;
+    max-width: 650px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    animation: slideUp 0.3s ease;
+}
+
+.export-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: var(--muted);
+    font-size: 28px;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.export-close:hover {
+    background: var(--accent);
+    color: #fff;
+    transform: rotate(90deg);
+}
+
+.export-modal-content h2 {
+    margin: 0 0 10px 0;
+    color: var(--accent);
+    font-size: 28px;
+}
+
+.export-subtitle {
+    color: var(--muted);
+    margin: 0 0 20px 0;
+    opacity: 0.8;
+}
+
+.export-info {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 12px 15px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+}
+
+.export-economy {
+    color: var(--accent);
+    font-weight: 600;
+}
+
+.export-section {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.export-section h3 {
+    margin: 0 0 10px 0;
+    color: var(--accent);
+    font-size: 18px;
+}
+
+.export-tip {
+    color: var(--muted);
+    font-size: 14px;
+    margin: 0 0 15px 0;
+    opacity: 0.8;
+}
+
+.export-warning {
+    border-color: #ff6b6b;
+    background: rgba(255, 107, 107, 0.1);
+}
+
+.export-warning h3 {
+    color: #ff6b6b;
+}
+
+/* Container do QR Code */
+.qr-container {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    display: inline-flex;
+    margin: 15px 0;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.qr-container canvas,
+.qr-container img {
+    display: block;
+    border-radius: 5px;
+}
+
+.export-error {
+    color: #ff6b6b;
+    font-style: italic;
+}
+
+/* Caixa de Link */
+.export-link-box {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 3px;
+    margin-bottom: 12px;
+}
+
+.export-link-box input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: var(--accent);
+    padding: 10px 12px;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+}
+
+.export-link-box input:focus {
+    outline: none;
+}
+
+/* Caixa de Texto */
+.export-text-box {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 3px;
+    margin-bottom: 12px;
+}
+
+.export-text-box textarea {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    padding: 12px;
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    resize: vertical;
+    min-height: 100px;
+    max-height: 200px;
+}
+
+.export-text-box textarea:focus {
+    outline: none;
+}
+
+/* Botões de Ação */
+.export-action-btn {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+}
+
+.export-action-btn:hover {
+    background: var(--accent-2);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(201, 161, 74, 0.4);
+}
+
+.export-action-btn.secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--muted);
+}
+
+.export-action-btn.secondary:hover {
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+}
+
+.export-old {
+    border-top: 2px dashed rgba(255, 255, 255, 0.1);
+    padding-top: 20px;
+}
+
+/* Modal de Importação */
+.import-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    padding: 20px;
+    animation: fadeIn 0.2s ease;
+}
+
+.import-modal-content {
+    background: var(--panel);
+    border: 2px solid var(--accent);
+    border-radius: var(--radius);
+    padding: 30px;
+    max-width: 550px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    animation: slideUp 0.3s ease;
+}
+
+.import-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: var(--muted);
+    font-size: 28px;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.import-close:hover {
+    background: var(--accent);
+    color: #fff;
+    transform: rotate(90deg);
+}
+
+.import-modal-content h2 {
+    margin: 0 0 10px 0;
+    color: var(--accent);
+    font-size: 28px;
+}
+
+.import-subtitle {
+    color: var(--muted);
+    margin: 0 0 20px 0;
+    opacity: 0.8;
+}
+
+.import-section {
+    margin-bottom: 20px;
+}
+
+.import-section label {
+    display: block;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.import-section textarea {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: var(--muted);
+    padding: 15px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    resize: vertical;
+    min-height: 150px;
+}
+
+.import-section textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(201, 161, 74, 0.1);
+}
+
+.import-actions {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.import-btn-cancel,
+.import-btn-confirm,
+.import-btn-file {
+    flex: 1;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+}
+
+.import-btn-cancel {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--muted);
+}
+
+.import-btn-cancel:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.import-btn-confirm {
+    background: var(--accent);
+    color: #fff;
+}
+
+.import-btn-confirm:hover {
+    background: var(--accent-2);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(201, 161, 74, 0.4);
+}
+
+.import-divider {
+    text-align: center;
+    margin: 25px 0;
+    position: relative;
+}
+
+.import-divider::before,
+.import-divider::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 40%;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.import-divider::before {
+    left: 0;
+}
+
+.import-divider::after {
+    right: 0;
+}
+
+.import-divider span {
+    color: var(--muted);
+    background: var(--panel);
+    padding: 0 15px;
+    position: relative;
+}
+
+.import-file-section {
+    text-align: center;
+}
+
+.import-tip {
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 12px;
+    opacity: 0.8;
+}
+
+.import-btn-file {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--muted);
+    width: 100%;
+}
+
+.import-btn-file:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* Modal de Auto-Importação */
+.auto-import-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10001;
+    padding: 20px;
+    animation: fadeIn 0.3s ease;
+}
+
+.auto-import-content {
+    background: var(--panel);
+    border: 3px solid var(--accent);
+    border-radius: 15px;
+    padding: 40px;
+    max-width: 450px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.7);
+    animation: scaleIn 0.3s ease;
+}
+
+.auto-import-icon {
+    font-size: 64px;
+    margin-bottom: 20px;
+    animation: bounce 0.6s ease;
+}
+
+.auto-import-content h2 {
+    margin: 0 0 20px 0;
+    color: var(--accent);
+    font-size: 26px;
+}
+
+.auto-import-info {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 20px;
+    border-radius: 10px;
+    margin: 20px 0;
+    text-align: left;
+}
+
+.auto-import-info p {
+    margin: 8px 0;
+    color: var(--muted);
+    font-size: 15px;
+}
+
+.auto-import-info strong {
+    color: var(--accent);
+}
+
+.auto-import-warning {
+    color: #ff6b6b;
+    font-size: 14px;
+    margin: 20px 0;
+    padding: 12px;
+    background: rgba(255, 107, 107, 0.1);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 107, 107, 0.3);
+}
+
+.auto-import-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 25px;
+}
+
+.auto-import-cancel,
+.auto-import-confirm {
+    flex: 1;
+    padding: 14px 24px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+}
+
+.auto-import-cancel {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--muted);
+}
+
+.auto-import-cancel:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+}
+
+.auto-import-confirm {
+    background: var(--accent);
+    color: #fff;
+}
+
+.auto-import-confirm:hover {
+    background: var(--accent-2);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(201, 161, 74, 0.5);
+}
+
+/* Animações */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* Responsividade Mobile */
+@media (max-width: 600px) {
+    .export-modal-content,
+    .import-modal-content,
+    .auto-import-content {
+        padding: 20px;
+        max-height: 85vh;
+    }
+    
+    .export-modal-content h2,
+    .import-modal-content h2,
+    .auto-import-content h2 {
+        font-size: 22px;
+    }
+    
+    .qr-container {
+        padding: 15px;
+    }
+    
+    .export-section {
+        padding: 15px;
+    }
+    
+    .export-action-btn,
+    .import-btn-cancel,
+    .import-btn-confirm,
+    .import-btn-file {
+        font-size: 14px;
+        padding: 10px 18px;
+    }
+    
+    .auto-import-icon {
+        font-size: 48px;
+    }
+}
+
+/* Tema Claro - Ajustes */
+[data-theme="light"] .export-modal,
+[data-theme="light"] .import-modal,
+[data-theme="light"] .auto-import-modal {
+    background: rgba(0, 0, 0, 0.6);
+}
+
+[data-theme="light"] .export-link-box,
+[data-theme="light"] .export-text-box {
+    background: rgba(0, 0, 0, 0.05);
+    border-color: rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="light"] .qr-container {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}

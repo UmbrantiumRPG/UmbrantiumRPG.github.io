@@ -377,9 +377,20 @@ function showRollModal(rolls, highest, mod, total, skillName) {
 // Exportar/Importar Ficha
 // ----------------------
 function exportarFicha() {
-    const dados = {};
+    abrirModalExportacao();
+}
+
+// ----------------------
+// SISTEMA DE EXPORTAÇÃO COM QR CODE
+// ----------------------
+
+function abrirModalExportacao() {
+    // Remove modal existente se houver
+    const existente = document.querySelector('.export-modal');
+    if (existente) existente.remove();
     
-    // Coleta todos os dados do localStorage com o prefixo correto
+    // Coleta todos os dados
+    const dados = {};
     for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
         if (key.startsWith('umbrantium-')) {
@@ -387,25 +398,211 @@ function exportarFicha() {
         }
     }
     
-    // Cria um objeto JSON
     const fichaData = {
         versao: '1.0',
         dataExportacao: new Date().toISOString(),
         dados: dados
     };
     
-    // Converte para JSON e cria um blob
+    const jsonString = JSON.stringify(fichaData);
+    const nomePersonagem = localStorage.getItem('umbrantium-index-personagem') || 'Ficha';
+    
+    // Comprime usando LZ-String
+    let compressed;
+    try {
+        compressed = LZString.compressToEncodedURIComponent(jsonString);
+    } catch (e) {
+        console.error('Erro ao comprimir:', e);
+        mostrarNotificacao('Erro ao preparar exportação', 'error');
+        return;
+    }
+    
+    // Calcula tamanho
+    const tamanhoBruto = new Blob([jsonString]).size;
+    const tamanhoComprimido = compressed.length;
+    const economiaPercentual = Math.round((1 - tamanhoComprimido / tamanhoBruto) * 100);
+    
+    // Gera URL
+    const baseUrl = window.location.origin + window.location.pathname.replace(/[^\/]+$/, '');
+    const importUrl = `${baseUrl}personagens.html#import=${compressed}`;
+    
+    // Verifica se é muito grande para QR Code
+    const tamanhoMB = (tamanhoComprimido / 1024 / 1024).toFixed(2);
+    const muitoGrande = tamanhoComprimido > 2000; // QR Code ideal até ~2KB
+    
+    // Cria modal
+    const modal = document.createElement('div');
+    modal.className = 'export-modal';
+    modal.innerHTML = `
+        <div class="export-modal-content">
+            <button class="export-close" title="Fechar">×</button>
+            <h2>🚀 Exportar Ficha</h2>
+            <p class="export-subtitle">Escolha como compartilhar</p>
+            
+            <div class="export-info">
+                <span>📊 Tamanho: <strong>${(tamanhoBruto/1024).toFixed(1)}KB</strong> → <strong>${(tamanhoComprimido/1024).toFixed(1)}KB</strong></span>
+                <span class="export-economy">(${economiaPercentual}% menor)</span>
+            </div>
+            
+            ${!muitoGrande ? `
+            <div class="export-section">
+                <h3>📱 1. Escanear QR Code</h3>
+                <p class="export-tip">Melhor para mobile - apenas escaneie com a câmera</p>
+                <div class="qr-container" id="qr-code-container"></div>
+                <button class="export-action-btn secondary" onclick="baixarQRCode()">💾 Baixar QR Code</button>
+            </div>
+            ` : `
+            <div class="export-section export-warning">
+                <h3>⚠️ QR Code indisponível</h3>
+                <p>Ficha muito grande para QR Code (${(tamanhoComprimido/1024).toFixed(1)}KB). Use as opções abaixo.</p>
+            </div>
+            `}
+            
+            <div class="export-section">
+                <h3>🔗 2. Enviar Link</h3>
+                <p class="export-tip">Compartilhe via WhatsApp, Email, Telegram, etc</p>
+                <div class="export-link-box">
+                    <input type="text" readonly value="${importUrl}" id="export-link-input">
+                </div>
+                <button class="export-action-btn" onclick="copiarLink()">📋 Copiar Link</button>
+            </div>
+            
+            <div class="export-section">
+                <h3>📝 3. Código Manual (Fallback)</h3>
+                <p class="export-tip">Cole no campo de importação</p>
+                <div class="export-text-box">
+                    <textarea readonly id="export-text-area">${compressed}</textarea>
+                </div>
+                <button class="export-action-btn" onclick="copiarTexto()">📋 Copiar Código</button>
+            </div>
+            
+            <div class="export-section export-old">
+                <h3>💾 Modo Clássico</h3>
+                <p class="export-tip">Baixar arquivo .json tradicional</p>
+                <button class="export-action-btn secondary" onclick="exportarJSON()">⬇️ Baixar JSON</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Gera QR Code se não for muito grande
+    if (!muitoGrande && typeof QRCode !== 'undefined') {
+        setTimeout(() => {
+            try {
+                const qrContainer = document.getElementById('qr-code-container');
+                if (qrContainer) {
+                    qrContainer.innerHTML = ''; // Limpa
+                    new QRCode(qrContainer, {
+                        text: importUrl,
+                        width: 280,
+                        height: 280,
+                        colorDark: '#000000',
+                        colorLight: '#ffffff',
+                        correctLevel: QRCode.CorrectLevel.M
+                    });
+                }
+            } catch (e) {
+                console.error('Erro ao gerar QR Code:', e);
+                document.getElementById('qr-code-container').innerHTML = 
+                    '<p class="export-error">Erro ao gerar QR Code. Use as outras opções.</p>';
+            }
+        }, 100);
+    }
+    
+    // Fecha ao clicar no X ou fora
+    modal.querySelector('.export-close').addEventListener('click', () => modal.remove());
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.remove();
+    });
+}
+
+function copiarLink() {
+    const input = document.getElementById('export-link-input');
+    input.select();
+    input.setSelectionRange(0, 99999); // Mobile
+    
+    try {
+        document.execCommand('copy');
+        mostrarNotificacao('✅ Link copiado! Cole no WhatsApp ou Email', 'success');
+    } catch (e) {
+        // Fallback para navegadores modernos
+        navigator.clipboard.writeText(input.value).then(() => {
+            mostrarNotificacao('✅ Link copiado!', 'success');
+        }).catch(() => {
+            mostrarNotificacao('❌ Erro ao copiar. Selecione e copie manualmente.', 'error');
+        });
+    }
+}
+
+function copiarTexto() {
+    const textarea = document.getElementById('export-text-area');
+    textarea.select();
+    textarea.setSelectionRange(0, 99999); // Mobile
+    
+    try {
+        document.execCommand('copy');
+        mostrarNotificacao('✅ Código copiado! Cole na importação', 'success');
+    } catch (e) {
+        navigator.clipboard.writeText(textarea.value).then(() => {
+            mostrarNotificacao('✅ Código copiado!', 'success');
+        }).catch(() => {
+            mostrarNotificacao('❌ Erro ao copiar. Selecione e copie manualmente.', 'error');
+        });
+    }
+}
+
+function baixarQRCode() {
+    const qrContainer = document.getElementById('qr-code-container');
+    const canvas = qrContainer.querySelector('canvas');
+    
+    if (!canvas) {
+        mostrarNotificacao('❌ QR Code não disponível', 'error');
+        return;
+    }
+    
+    try {
+        canvas.toBlob((blob) => {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            const nomePersonagem = localStorage.getItem('umbrantium-index-personagem') || 'Ficha';
+            a.href = url;
+            a.download = `${nomePersonagem}_QRCode.png`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            mostrarNotificacao('✅ QR Code baixado!', 'success');
+        });
+    } catch (e) {
+        console.error('Erro ao baixar QR:', e);
+        mostrarNotificacao('❌ Erro ao baixar QR Code', 'error');
+    }
+}
+
+function exportarJSON() {
+    const dados = {};
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key.startsWith('umbrantium-')) {
+            dados[key] = localStorage.getItem(key);
+        }
+    }
+    
+    const fichaData = {
+        versao: '1.0',
+        dataExportacao: new Date().toISOString(),
+        dados: dados
+    };
+    
     const jsonString = JSON.stringify(fichaData, null, 2);
     const blob = new Blob([jsonString], { type: 'application/json' });
-    
-    // Cria um link de download
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url;
     
-    // Nome do arquivo com data
     const nomePersonagem = localStorage.getItem('umbrantium-index-personagem') || 'Ficha';
     const dataFormatada = new Date().toISOString().split('T')[0];
+    a.href = url;
     a.download = `${nomePersonagem}_${dataFormatada}.json`;
     
     document.body.appendChild(a);
@@ -413,7 +610,7 @@ function exportarFicha() {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     
-    mostrarNotificacao('Ficha exportada com sucesso!', 'success');
+    mostrarNotificacao('✅ JSON exportado com sucesso!', 'success');
 }
 
 function importarFicha(arquivo) {
@@ -428,35 +625,7 @@ function importarFicha(arquivo) {
                 throw new Error('Arquivo inválido');
             }
             
-            // Confirmação antes de sobrescrever
-            const confirmar = confirm(
-                'Importar esta ficha irá sobrescrever todos os dados atuais. Deseja continuar?\n\n' +
-                'Dica: Exporte sua ficha atual primeiro como backup!'
-            );
-            
-            if (!confirmar) return;
-            
-            // Limpa dados antigos do Umbrantium
-            const keysParaRemover = [];
-            for (let i = 0; i < localStorage.length; i++) {
-                const key = localStorage.key(i);
-                if (key.startsWith('umbrantium-')) {
-                    keysParaRemover.push(key);
-                }
-            }
-            keysParaRemover.forEach(key => localStorage.removeItem(key));
-            
-            // Importa novos dados
-            Object.keys(fichaData.dados).forEach(key => {
-                localStorage.setItem(key, fichaData.dados[key]);
-            });
-            
-            mostrarNotificacao('Ficha importada com sucesso! Recarregando página...', 'success');
-            
-            // Recarrega a página após 1 segundo
-            setTimeout(() => {
-                location.reload();
-            }, 1000);
+            processarImportacao(fichaData);
             
         } catch (erro) {
             mostrarNotificacao('Erro ao importar ficha. Verifique se o arquivo é válido.', 'error');
@@ -465,6 +634,232 @@ function importarFicha(arquivo) {
     };
     
     reader.readAsText(arquivo);
+}
+
+// Função para processar importação de código/texto
+function importarDeCodigo() {
+    abrirModalImportacao();
+}
+
+function abrirModalImportacao() {
+    const existente = document.querySelector('.import-modal');
+    if (existente) existente.remove();
+    
+    const modal = document.createElement('div');
+    modal.className = 'import-modal';
+    modal.innerHTML = `
+        <div class="import-modal-content">
+            <button class="import-close" title="Fechar">×</button>
+            <h2>📥 Importar Ficha</h2>
+            <p class="import-subtitle">Cole o código recebido</p>
+            
+            <div class="import-section">
+                <label for="import-code-input">Código da Ficha:</label>
+                <textarea 
+                    id="import-code-input" 
+                    placeholder="Cole aqui o código completo que você recebeu..."
+                    rows="8"
+                ></textarea>
+            </div>
+            
+            <div class="import-actions">
+                <button class="import-btn-cancel" onclick="document.querySelector('.import-modal').remove()">
+                    Cancelar
+                </button>
+                <button class="import-btn-confirm" onclick="processarImportacaoDeCodigo()">
+                    ✅ Importar Ficha
+                </button>
+            </div>
+            
+            <div class="import-divider">
+                <span>ou</span>
+            </div>
+            
+            <div class="import-file-section">
+                <p class="import-tip">Importar arquivo .json tradicional:</p>
+                <button class="import-btn-file" onclick="document.getElementById('import-file').click()">
+                    📁 Selecionar Arquivo JSON
+                </button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    modal.querySelector('.import-close').addEventListener('click', () => modal.remove());
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.remove();
+    });
+    
+    // Foco automático no textarea
+    setTimeout(() => {
+        document.getElementById('import-code-input')?.focus();
+    }, 100);
+}
+
+function processarImportacaoDeCodigo() {
+    const textarea = document.getElementById('import-code-input');
+    const codigo = textarea.value.trim();
+    
+    if (!codigo) {
+        mostrarNotificacao('❌ Cole o código antes de importar', 'error');
+        return;
+    }
+    
+    try {
+        // Tenta descomprimir
+        const jsonString = LZString.decompressFromEncodedURIComponent(codigo);
+        
+        if (!jsonString) {
+            throw new Error('Código inválido');
+        }
+        
+        const fichaData = JSON.parse(jsonString);
+        
+        if (!fichaData.dados) {
+            throw new Error('Formato inválido');
+        }
+        
+        // Fecha o modal antes de processar
+        document.querySelector('.import-modal')?.remove();
+        
+        processarImportacao(fichaData);
+        
+    } catch (erro) {
+        console.error('Erro ao importar:', erro);
+        mostrarNotificacao('❌ Código inválido. Verifique se copiou corretamente.', 'error');
+    }
+}
+
+function processarImportacao(fichaData) {
+    // Confirmação antes de sobrescrever
+    const nomeNovo = fichaData.dados['umbrantium-index-personagem'] || 'Ficha Importada';
+    const confirmar = confirm(
+        `Importar "${nomeNovo}"?\n\n` +
+        'ATENÇÃO: Isso irá sobrescrever todos os dados atuais!\n\n' +
+        'Dica: Exporte sua ficha atual primeiro como backup!'
+    );
+    
+    if (!confirmar) return;
+    
+    try {
+        // Limpa dados antigos do Umbrantium
+        const keysParaRemover = [];
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.startsWith('umbrantium-')) {
+                keysParaRemover.push(key);
+            }
+        }
+        keysParaRemover.forEach(key => localStorage.removeItem(key));
+        
+        // Importa novos dados
+        Object.keys(fichaData.dados).forEach(key => {
+            localStorage.setItem(key, fichaData.dados[key]);
+        });
+        
+        mostrarNotificacao('✅ Ficha importada com sucesso! Recarregando...', 'success');
+        
+        // Recarrega a página após 1.5 segundos
+        setTimeout(() => {
+            location.reload();
+        }, 1500);
+        
+    } catch (erro) {
+        console.error('Erro ao processar importação:', erro);
+        mostrarNotificacao('❌ Erro ao importar ficha', 'error');
+    }
+}
+
+// ----------------------
+// AUTO-IMPORTAÇÃO VIA URL HASH
+// ----------------------
+
+function verificarImportacaoViaURL() {
+    const hash = window.location.hash;
+    
+    if (hash.startsWith('#import=')) {
+        const codigo = hash.substring(8); // Remove '#import='
+        
+        if (!codigo) return;
+        
+        try {
+            const jsonString = LZString.decompressFromEncodedURIComponent(codigo);
+            
+            if (!jsonString) {
+                throw new Error('Código inválido');
+            }
+            
+            const fichaData = JSON.parse(jsonString);
+            
+            if (!fichaData.dados) {
+                throw new Error('Formato inválido');
+            }
+            
+            // Remove o hash da URL
+            history.replaceState(null, '', window.location.pathname);
+            
+            // Mostra modal de confirmação personalizado
+            mostrarConfirmacaoImportacao(fichaData);
+            
+        } catch (erro) {
+            console.error('Erro ao processar link:', erro);
+            mostrarNotificacao('❌ Link de importação inválido', 'error');
+            history.replaceState(null, '', window.location.pathname);
+        }
+    }
+}
+
+function mostrarConfirmacaoImportacao(fichaData) {
+    const existente = document.querySelector('.auto-import-modal');
+    if (existente) existente.remove();
+    
+    const nomePersonagem = fichaData.dados['umbrantium-index-personagem'] || 'Personagem';
+    const classe = fichaData.dados['umbrantium-index-classe'] || '';
+    const nivel = fichaData.dados['umbrantium-index-nivel'] || '';
+    
+    const modal = document.createElement('div');
+    modal.className = 'auto-import-modal';
+    modal.innerHTML = `
+        <div class="auto-import-content">
+            <div class="auto-import-icon">📥</div>
+            <h2>Importar Ficha Recebida?</h2>
+            
+            <div class="auto-import-info">
+                <p><strong>Nome:</strong> ${escapeHtml(nomePersonagem)}</p>
+                ${classe ? `<p><strong>Classe:</strong> ${escapeHtml(classe)}</p>` : ''}
+                ${nivel ? `<p><strong>Nível:</strong> ${escapeHtml(nivel)}</p>` : ''}
+            </div>
+            
+            <p class="auto-import-warning">
+                ⚠️ Isso substituirá todos os dados atuais no seu navegador!
+            </p>
+            
+            <div class="auto-import-actions">
+                <button class="auto-import-cancel" onclick="document.querySelector('.auto-import-modal').remove()">
+                    Cancelar
+                </button>
+                <button class="auto-import-confirm" id="confirm-auto-import">
+                    ✅ Sim, Importar
+                </button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Evento de confirmar
+    document.getElementById('confirm-auto-import').addEventListener('click', () => {
+        modal.remove();
+        processarImportacao(fichaData);
+    });
+    
+    // Fecha ao clicar fora
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.remove();
+        }
+    });
 }
 
 function mostrarNotificacao(mensagem, tipo = 'info') {
@@ -815,16 +1210,17 @@ function limparTodosDados() {
     }
     
     if (importBtn && importFile) {
+        // Botão abre modal de importação
         importBtn.addEventListener('click', () => {
-            importFile.click();
+            importarDeCodigo();
         });
         
+        // Arquivo JSON tradicional
         importFile.addEventListener('change', (e) => {
             const arquivo = e.target.files[0];
             if (arquivo) {
                 importarFicha(arquivo);
             }
-            // Limpa o input para permitir importar o mesmo arquivo novamente
             e.target.value = '';
         });
     }
@@ -832,6 +1228,9 @@ function limparTodosDados() {
     if (clearBtn) {
         clearBtn.addEventListener('click', limparTodosDados);
     }
+    
+    // Verifica se há importação via URL ao carregar
+    verificarImportacaoViaURL();
 
     // ----------------------
 // Sistema de Som
