@@ -2,8 +2,8 @@
 // SISTEMA DE GERENCIAMENTO DE MÚLTIPLOS PERSONAGENS
 // =====================================================
 
-const CHARACTERS_LIST_KEY = 'umbrantium-characters-list';
-const CURRENT_CHARACTER_KEY = 'umbrantium-current-character';
+// NOTA: CHARACTERS_LIST_KEY e CURRENT_CHARACTER_KEY já estão declarados em script.js
+// Não redeclarar aqui para evitar erro de "already declared"
 
 // =====================================================
 // FUNÇÕES PRINCIPAIS
@@ -171,9 +171,8 @@ function removeCharacterData(charId) {
 // =====================================================
 
 // Obter ID do personagem atual
-function getCurrentCharacterId() {
-    return localStorage.getItem(CURRENT_CHARACTER_KEY);
-}
+// Obter ID do personagem atual - FUNÇÃO JÁ EXISTE EM script.js
+// (removido daqui para evitar duplicação)
 
 // Definir personagem atual
 function setCurrentCharacter(charId) {
@@ -212,35 +211,51 @@ function selectCharacter(charId) {
 let editingCharId = null;
 
 function openCharacterModal(charId = null) {
+    console.log('📝 Abrindo modal de personagem...', charId ? `Editar: ${charId}` : 'Novo');
+    
     const modal = document.getElementById('character-modal');
     const title = document.getElementById('modal-title');
     const nameInput = document.getElementById('char-name');
     const classInput = document.getElementById('char-class');
     const levelInput = document.getElementById('char-level');
     
-    if (!modal) return;
+    console.log('Modal encontrado:', !!modal);
+    console.log('Inputs encontrados:', !!nameInput, !!classInput, !!levelInput);
+    
+    if (!modal) {
+        console.error('❌ Modal não encontrado!');
+        return;
+    }
     
     editingCharId = charId;
     
     if (charId) {
         // Modo edição
         const char = getCharacterById(charId);
-        if (!char) return;
+        if (!char) {
+            console.error('❌ Personagem não encontrado:', charId);
+            return;
+        }
         
         title.textContent = 'Editar Personagem';
         nameInput.value = char.name;
         classInput.value = char.class || '';
         levelInput.value = char.level || '1';
+        console.log('✏️ Modo edição:', char.name);
     } else {
         // Modo criação
         title.textContent = 'Novo Personagem';
         nameInput.value = '';
         classInput.value = '';
         levelInput.value = '1';
+        console.log('➕ Modo criação');
     }
     
     modal.style.display = 'flex';
-    setTimeout(() => nameInput.focus(), 100);
+    console.log('✅ Modal aberto!');
+    setTimeout(() => {
+        if (nameInput) nameInput.focus();
+    }, 100);
 }
 
 function closeCharacterModal() {
@@ -349,13 +364,27 @@ function deleteCharacter(charId) {
 // =====================================================
 
 function setupEventListeners() {
+    console.log('🔧 Configurando event listeners...');
+    
     const createBtn = document.getElementById('create-character');
     const cancelBtn = document.getElementById('cancel-char');
     const form = document.getElementById('character-form');
     const modal = document.getElementById('character-modal');
     
+    console.log('Elementos encontrados:');
+    console.log('  - Botão Criar:', !!createBtn);
+    console.log('  - Botão Cancelar:', !!cancelBtn);
+    console.log('  - Form:', !!form);
+    console.log('  - Modal:', !!modal);
+    
     if (createBtn) {
-        createBtn.addEventListener('click', () => openCharacterModal());
+        createBtn.addEventListener('click', () => {
+            console.log('🖱️ Botão "Novo Personagem" clicado!');
+            openCharacterModal();
+        });
+        console.log('✅ Event listener adicionado ao botão criar');
+    } else {
+        console.error('❌ Botão "create-character" não encontrado!');
     }
     
     if (cancelBtn) {
@@ -373,6 +402,8 @@ function setupEventListeners() {
             }
         });
     }
+    
+    console.log('✅ Event listeners configurados!');
 }
 
 // =====================================================
@@ -383,11 +414,15 @@ function generateId() {
     return 'char_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
 }
 
-function escapeHtml(text) {
-    if (!text) return '';
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
+// escapeHtml() - FUNÇÃO JÁ EXISTE EM script.js
+// (removido daqui para evitar duplicação)
+
+// Fallback para mostrarNotificacao se não existir
+if (typeof mostrarNotificacao === 'undefined') {
+    window.mostrarNotificacao = function(mensagem, tipo = 'info') {
+        console.log(`[${tipo.toUpperCase()}] ${mensagem}`);
+        alert(mensagem);
+    };
 }
 
 // =====================================================
@@ -395,5 +430,7 @@ function escapeHtml(text) {
 // =====================================================
 
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('🎮 Inicializando sistema de personagens...');
     initCharacterSystem();
+    console.log('✅ Sistema de personagens carregado!');
 });
