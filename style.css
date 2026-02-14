@@ -1547,7 +1547,7 @@ button.remove:hover {
     }
     
     .character-silhouette {
-        width: 100%;
+        width: 150%;
         margin: 0 auto;
     }
     
@@ -2997,7 +2997,7 @@ button.remove:hover {
     }
     
     .character-silhouette {
-        width: 90%;
+        width: 150%;
         opacity: 0.5;
     }
     
