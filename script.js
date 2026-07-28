@@ -309,26 +309,32 @@ function atualizarPericias(){
     savePericias();
 }
 
-// Rolar d20 com múltiplos dados baseado no atributo
-function rollD20For(btn){
+
+function rollD20For(btn) {
     const container = btn.closest('.pericia');
-    if(!container) return;
+    if (!container) return;
     
     const attr = container.dataset.attr;
     
     const attrs = {
-        agi:  parseInt(localStorage.getItem(prefix + 'agi') || localStorage.getItem('umbrantium-index-agi') || 0) || 0,
-        int:  parseInt(localStorage.getItem(prefix + 'int') || localStorage.getItem('umbrantium-index-int') || 0) || 0,
-        vig:  parseInt(localStorage.getItem(prefix + 'vig') || localStorage.getItem('umbrantium-index-vig') || 0) || 0,
-        pre:  parseInt(localStorage.getItem(prefix + 'pre') || localStorage.getItem('umbrantium-index-pre') || 0) || 0,
-        forca:parseInt(localStorage.getItem(prefix + 'forca') || localStorage.getItem('umbrantium-index-forca') || 0) || 0,
+        des: parseInt(localStorage.getItem(prefix + 'des') || localStorage.getItem('umbrantium-index-des') || 0) || 0,
+        int: parseInt(localStorage.getItem(prefix + 'int') || localStorage.getItem('umbrantium-index-int') || 0) || 0,
+        vig: parseInt(localStorage.getItem(prefix + 'vig') || localStorage.getItem('umbrantium-index-vig') || 0) || 0,
+        pre: parseInt(localStorage.getItem(prefix + 'pre') || localStorage.getItem('umbrantium-index-pre') || 0) || 0,
+        for: parseInt(localStorage.getItem(prefix + 'for') || localStorage.getItem('umbrantium-index-for') || 0) || 0,
+        flx: parseInt(localStorage.getItem(prefix + 'flx') || localStorage.getItem('umbrantium-index-flx') || 0) || 0,
+        apt: parseInt(localStorage.getItem(prefix + 'apt') || localStorage.getItem('umbrantium-index-apt') || 0) || 0,
     };
     
-    const attrValue = attrs[attr] || 1;
-    const numDice = Math.max(1, attrValue);
+    const attrValue = attrs[attr] || 0;
+    
+    // --- Nova Lógica de Cálculo de Dados ---
+    // Ex: 15 -> 1 dado | 23 -> 2 dados | 29 -> 2 dados | 30 -> 3 dados
+    // Math.max(1, ...) garante que até com valor baixo (ex: < 10) ainda se role ao menos 1 dado.
+    const numDice = Math.max(1, Math.floor(attrValue / 10));
     
     const rolls = [];
-    for(let i = 0; i < numDice; i++) {
+    for (let i = 0; i < numDice; i++) {
         rolls.push(Math.floor(Math.random() * 20) + 1);
     }
     
@@ -368,11 +374,13 @@ function rollSituacional(btn) {
     const total = highest + soma;
     
     const attrNames = {
-        'agi': 'AGI',
+        'des': 'DES',
         'int': 'INT',
         'vig': 'VIG',
         'pre': 'PRE',
-        'forca': 'FOR'
+        'for': 'FOR',
+        'flx': 'FLX',
+        'apt': 'APT'
     };
     
     const skillName = `Situacional (${attrNames[atributo] || atributo})`;
@@ -1021,7 +1029,7 @@ function escapeHtml(str){
 // ----------------------
 let habilidadeCounter = 0;
 
-function createHabilidadeEntry(nome="", custo="", descricao=""){
+function createHabilidadeEntry(nome="", custo="", distancia="", descricao=""){
     habilidadeCounter++;
     const id = `habilidade-${habilidadeCounter}`;
     const wrapper = document.createElement("div");
@@ -1030,11 +1038,12 @@ function createHabilidadeEntry(nome="", custo="", descricao=""){
     
     wrapper.innerHTML = `
         <div class="habilidade-header">
-            <input class="habilidade-nome" placeholder="Nome da Habilidade" value="${escapeHtml(nome)}">
+            <input class="habilidade-nome" placeholder="Nome" value="${escapeHtml(nome)}">
             <input class="habilidade-custo" type="text" placeholder="Custo" value="${escapeHtml(custo)}">
+            <input class="habilidade-distancia" type="text" placeholder="Distância" value="${escapeHtml(distancia)}">
             <button class="remove-btn">×</button>
         </div>
-        <textarea class="habilidade-descricao" placeholder="Descrição: efeito, alcance, duração...">${escapeHtml(descricao)}</textarea>
+        <textarea class="habilidade-descricao" placeholder="Descrição: efeito, tempo de recarga, duração...">${escapeHtml(descricao)}</textarea>
     `;
     
     wrapper.querySelector(".remove-btn").addEventListener("click", ()=>{
@@ -1055,6 +1064,7 @@ function saveHabilidades(){
     const list = rows.map(r => ({
         nome: r.querySelector(".habilidade-nome")?.value || "",
         custo: r.querySelector(".habilidade-custo")?.value || "",
+        distancia: r.querySelector(".habilidade-distancia")?.value || "",
         descricao: r.querySelector(".habilidade-descricao")?.value || ""
     }));
     localStorage.setItem(prefix + 'habilidades', JSON.stringify(list));
@@ -1066,7 +1076,7 @@ function loadHabilidades(){
     
     const data = JSON.parse(localStorage.getItem(prefix + 'habilidades') || "[]");
     if (data && data.length) {
-        data.forEach(h => createHabilidadeEntry(h.nome, h.custo, h.descricao));
+        data.forEach(h => createHabilidadeEntry(h.nome, h.custo, h.distancia, h.descricao));
     }
 }
 

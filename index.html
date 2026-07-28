@@ -5,17 +5,20 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>UMBRANTIUM – Ficha</title>
 <link rel="stylesheet" href="style.css">
+
 <script>
 (function() {
   const savedTheme = localStorage.getItem('umbrantium-theme') || 'dark';
   document.documentElement.setAttribute('data-theme', savedTheme);
 })();
 </script>
+
 </head>
 <body>
 <div class="app">
 <aside class="sidebar" id="sidebar">
     <div class="logo">UMBRANTIUM</div>
+
 <nav>
   <a href="personagens.html">Personagens</a>
   <a href="index.html">Ficha Atual</a>
@@ -25,14 +28,14 @@
 </nav>
     
 <div class="sidebar-export">
-    <button id="export-btn" class="sidebar-btn">📥 Exportar</button>
-    <button id="import-btn" class="sidebar-btn">📤 Importar</button>
-    <button id="clear-btn" class="sidebar-btn sidebar-btn-danger">🗑️ Limpar Tudo</button>
+    <button id="export-btn" class="sidebar-btn">Exportar</button>
+    <button id="import-btn" class="sidebar-btn">Importar</button>
+    <button id="clear-btn" class="sidebar-btn sidebar-btn-danger">Limpar Tudo</button>
     <input type="file" id="import-file" accept=".json" style="display:none">
   </div>
   
   <div class="sidebar-theme">
-    <label for="theme-selector">🎨 Tema</label>
+    <label for="theme-selector">Tema</label>
     <select id="theme-selector" class="theme-select">
       <option value="dark">Escuro (Padrão)</option>
       <option value="light">Claro</option>
@@ -66,11 +69,13 @@
         <div class="panel atributos">
           <h2>Atributos</h2>
           <div class="hex-grid">
-            <div class="hex"><label>AGI<input id="agi" type="text"></label></div>
-            <div class="hex"><label>INT<input id="int" type="text"></label></div>
-            <div class="hex"><label>VIG<input id="vig" type="text"></label></div>
-            <div class="hex"><label>PRE<input id="pre" type="text"></label></div>
-            <div class="hex"><label>FOR<input id="forca" type="text"></label></div>
+            <div class="hex"><label>VIGOR<input id="vig" type="text"></label></div>
+            <div class="hex"><label>APTIDÃO<input id="apt" type="text"></label></div>
+            <div class="hex"><label>FLUXO<input id="flx" type="text"></label></div>
+            <div class="hex"><label>FORÇA<input id="for" type="text"></label></div>
+            <div class="hex"><label>DESTREZA<input id="des" type="text"></label></div>
+            <div class="hex"><label>INTELIGÊNCIA<input id="int" type="text"></label></div>
+            <div class="hex"><label>PRESENÇA<input id="pre" type="text"></label></div>
           </div>
         </div>
 
@@ -79,7 +84,7 @@
             <label>PV (Maximo)<input id="pv" type="text"></label>
           </div>
           <div class="vital">
-            <label>MN (Maximo)<input id="mn" type="text"></label>
+            <label>AU (Maximo)<input id="au" type="text"></label>
           </div>
           <div class="vital">
             <label>ST (Maximo)<input id="st" type="text"></label>
@@ -91,7 +96,7 @@
             <label>PV (Atuais)<input id="pv-atual" type="text"></label>
           </div>
           <div class="vital">
-            <label>MN (Atuais)<input id="mn-atual" type="text"></label>
+            <label>AU (Atuais)<input id="au-atual" type="text"></label>
           </div>
           <div class="vital">
             <label>ST (Atuais)<input id="st-atual" type="text"></label>
@@ -100,7 +105,7 @@
 
         <div class="panel defesa">
           <label>Defesa<input id="defesa" type="text"></label>
-          <small>= 10 + AGI + equipamentos + outros</small>
+          <small>= 10 + DES/10 + equipamentos + outros</small>
         </div>
 
         <div class="panel ataques">
@@ -116,7 +121,7 @@
           <h2>Perícias</h2>
           <div class="pericias-grid">
             <!-- Acrobacia (DES) -->
-            <div class="pericia" data-attr="agi">
+            <div class="pericia" data-attr="des">
               <label>Acrobacia</label>
               <div class="dados">
                 <span class="calc">+0</span>
@@ -147,9 +152,25 @@
               </div>
             </div>
 
-            <!-- Arcanismo (INT) -->
+             <!-- Alquimia (INT) -->
             <div class="pericia" data-attr="int">
-              <label>Arcanismo</label>
+              <label>Alquimia</label>
+              <div class="dados">
+                <span class="calc">+0</span>
+                <select class="modificador">
+                  <option value="0">0</option>
+                  <option value="5">5</option>
+                  <option value="10">10</option>
+                  <option value="15">15</option>
+                </select>
+                <input type="text" class="outros" placeholder="Outros" value="0">
+                <button class="roll">🎲</button>
+              </div>
+            </div>
+
+            <!-- Auronismo (FLX) -->
+            <div class="pericia" data-attr="flx">
+              <label>Auronismo</label>
               <div class="dados">
                 <span class="calc">+0</span>
                 <select class="modificador">
@@ -180,7 +201,7 @@
             </div>
 
             <!-- Atletismo (FOR) -->
-            <div class="pericia" data-attr="forca">
+            <div class="pericia" data-attr="for">
               <label>Atletismo</label>
               <div class="dados">
                 <span class="calc">+0</span>
@@ -211,24 +232,8 @@
               </div>
             </div>
 
-            <!-- Ciência (INT) -->
-            <div class="pericia" data-attr="int">
-              <label>Ciência</label>
-              <div class="dados">
-                <span class="calc">+0</span>
-                <select class="modificador">
-                  <option value="0">0</option>
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="15">15</option>
-                </select>
-                <input type="text" class="outros" placeholder="Outros" value="0">
-                <button class="roll">🎲</button>
-              </div>
-            </div>
-
-            <!-- Crime (AGI) -->
-            <div class="pericia" data-attr="agi">
+            <!-- Crime (DES) -->
+            <div class="pericia" data-attr="des">
               <label>Crime</label>
               <div class="dados">
                 <span class="calc">+0</span>
@@ -275,8 +280,24 @@
               </div>
             </div>
 
-            <!-- Fortitude (VIG) -->
-            <div class="pericia" data-attr="vig">
+            <!-- Forja (FOR) -->
+            <div class="pericia" data-attr="for">
+              <label>Forja</label>
+              <div class="dados">
+                <span class="calc">+0</span>
+                <select class="modificador">
+                  <option value="0">0</option>
+                  <option value="5">5</option>
+                  <option value="10">10</option>
+                  <option value="15">15</option>
+                </select>
+                <input type="text" class="outros" placeholder="Outros" value="0">
+                <button class="roll">🎲</button>
+              </div>
+            </div>
+
+            <!-- Fortitude (APT) -->
+            <div class="pericia" data-attr="apt">
               <label>Fortitude</label>
               <div class="dados">
                 <span class="calc">+0</span>
@@ -292,7 +313,7 @@
             </div>
 
             <!-- Furtividade (DES) -->
-            <div class="pericia" data-attr="agi">
+            <div class="pericia" data-attr="des">
               <label>Furtividade</label>
               <div class="dados">
                 <span class="calc">+0</span>
@@ -308,7 +329,7 @@
             </div>
 
             <!-- Iniciativa (DES) -->
-            <div class="pericia" data-attr="agi">
+            <div class="pericia" data-attr="des">
               <label>Iniciativa</label>
               <div class="dados">
                 <span class="calc">+0</span>
@@ -372,7 +393,7 @@
             </div>
 
             <!-- Luta (FOR) -->
-            <div class="pericia" data-attr="forca">
+            <div class="pericia" data-attr="for">
               <label>Luta</label>
               <div class="dados">
                 <span class="calc">+0</span>
@@ -419,8 +440,8 @@
               </div>
             </div>
 
-            <!-- Pilotagem (AGI) -->
-            <div class="pericia" data-attr="agi">
+            <!-- Pilotagem (DES) -->
+            <div class="pericia" data-attr="des">
               <label>Pilotagem</label>
               <div class="dados">
                 <span class="calc">+0</span>
@@ -435,8 +456,8 @@
               </div>
             </div>
 
-            <!-- Pontaria (AGI) -->
-            <div class="pericia" data-attr="agi">
+            <!-- Pontaria (DES) -->
+            <div class="pericia" data-attr="des">
               <label>Pontaria</label>
               <div class="dados">
                 <span class="calc">+0</span>
@@ -451,8 +472,8 @@
               </div>
             </div>
 
-            <!-- Reflexo (AGI) -->
-            <div class="pericia" data-attr="agi">
+            <!-- Reflexo (DES) -->
+            <div class="pericia" data-attr="des">
               <label>Reflexo</label>
               <div class="dados">
                 <span class="calc">+0</span>
@@ -541,11 +562,13 @@
           <div class="situacional-item">
             <select class="sit-atributo">
               <option value="">Atributo</option>
-              <option value="agi">AGI</option>
+              <option value="des">DES</option>
               <option value="int">INT</option>
               <option value="vig">VIG</option>
               <option value="pre">PRE</option>
-              <option value="forca">FOR</option>
+              <option value="for">FOR</option>
+              <option value="apt">APT</option>
+              <option value="flx">FLX</option>
             </select>
             <input type="text" class="sit-dados" placeholder="Dados" value="1" min="1">
             <input type="text" class="sit-soma" placeholder="Soma" value="0">
@@ -555,11 +578,13 @@
           <div class="situacional-item">
             <select class="sit-atributo">
               <option value="">Atributo</option>
-              <option value="agi">AGI</option>
+              <option value="des">DES</option>
               <option value="int">INT</option>
               <option value="vig">VIG</option>
               <option value="pre">PRE</option>
-              <option value="forca">FOR</option>
+              <option value="for">FOR</option>
+              <option value="apt">APT</option>
+              <option value="flx">FLX</option>
             </select>
             <input type="text" class="sit-dados" placeholder="Dados" value="1" min="1">
             <input type="text" class="sit-soma" placeholder="Soma" value="0">
@@ -569,11 +594,13 @@
           <div class="situacional-item">
             <select class="sit-atributo">
               <option value="">Atributo</option>
-              <option value="agi">AGI</option>
+              <option value="des">DES</option>
               <option value="int">INT</option>
               <option value="vig">VIG</option>
               <option value="pre">PRE</option>
-              <option value="forca">FOR</option>
+              <option value="for">FOR</option>
+              <option value="apt">APT</option>
+              <option value="flx">FLX</option>
             </select>
             <input type="text" class="sit-dados" placeholder="Dados" value="1" min="1">
             <input type="text" class="sit-soma" placeholder="Soma" value="0">
