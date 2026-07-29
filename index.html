@@ -45,8 +45,6 @@
       <option value="crimson">Vermelho Carmesim</option>
     </select>
   </div>
-    
-    <div class="brand-small">Umbrantium</div>
     <button class="toggle" id="menuToggle">☰</button>
   </aside>
 
@@ -57,557 +55,530 @@
     </header>
 
     <section class="sheet">
-      <div class="left-col">
+  <!-- Botões das Abas -->
+  <div class="sheet-tabs">
+    <button type="button" class="tab-btn active" data-tab="tab-atributos">
+      ATRIBUTOS e STATUS
+    </button>
+    <button type="button" class="tab-btn" data-tab="tab-ataques-pericias">
+      ATAQUES e PERÍCIAS
+    </button>
+  </div>
 
-        <div class="panel basics">
-          <label>Personagem<input id="personagem" type="text"></label>
-          <label>Jogador<input id="jogador" type="text"></label>
-          <label>Origem<input id="origem" type="text"></label>
-          <label>Classe<input id="classe" type="text"></label>
-        </div>
+  <!-- Conteúdo da Aba 1: Atributos e Status -->
+  <div id="tab-atributos" class="tab-content active">
+    <div class="panel basics">
+      <label>Personagem<input id="personagem" type="text"></label>
+      <label>Jogador<input id="jogador" type="text"></label>
+      <label>Origem<input id="origem" type="text"></label>
+      <label>Classe<input id="classe" type="text"></label>
+    </div>
 
-        <div class="panel atributos">
-          <h2>Atributos</h2>
-          <div class="hex-grid">
-            <div class="hex"><label>VIGOR<input id="vig" type="text"></label></div>
-            <div class="hex"><label>APTIDÃO<input id="apt" type="text"></label></div>
-            <div class="hex"><label>FLUXO<input id="flx" type="text"></label></div>
-            <div class="hex"><label>FORÇA<input id="for" type="text"></label></div>
-            <div class="hex"><label>DESTREZA<input id="des" type="text"></label></div>
-            <div class="hex"><label>INTELIGÊNCIA<input id="int" type="text"></label></div>
-            <div class="hex"><label>PRESENÇA<input id="pre" type="text"></label></div>
-          </div>
-        </div>
+    <div class="panel atributos">
+      <h2>Atributos</h2>
+      <div class="hex-grid">
+        <div class="hex"><label>VIGOR<input id="vig" type="text"></label></div>
+        <div class="hex"><label>APTIDÃO<input id="apt" type="text"></label></div>
+        <div class="hex"><label>FLUXO<input id="flx" type="text"></label></div>
+        <div class="hex"><label>FORÇA<input id="for" type="text"></label></div>
+        <div class="hex"><label>DESTREZA<input id="des" type="text"></label></div>
+        <div class="hex"><label>INTELIGÊNCIA<input id="int" type="text"></label></div>
+        <div class="hex"><label>PRESENÇA<input id="pre" type="text"></label></div>
+      </div>
+    </div>
 
-        <div class="panel vitals">
-          <div class="vital">
-            <label>PV (Maximo)<input id="pv" type="text"></label>
-          </div>
-          <div class="vital">
-            <label>AU (Maximo)<input id="au" type="text"></label>
-          </div>
-          <div class="vital">
-            <label>ST (Maximo)<input id="st" type="text"></label>
-          </div>
-        </div>
+    <div class="panel vitals">
+      <div class="hex"><label>PV (Máximo)<input id="pv" type="text"></label></div>
+      <div class="hex"><label>AU (Máximo)<input id="au" type="text"></label></div>
+      <div class="hex"><label>ST (Máximo)<input id="st" type="text"></label></div>
+      <div class="hex"><label>SAN (Máxima)<input id="san" type="text"></label></div>
+    </div>
 
-        <div class="panel vitals">
-          <div class="vital">
-            <label>PV (Atuais)<input id="pv-atual" type="text"></label>
-          </div>
-          <div class="vital">
-            <label>AU (Atuais)<input id="au-atual" type="text"></label>
-          </div>
-          <div class="vital">
-            <label>ST (Atuais)<input id="st-atual" type="text"></label>
-          </div>
-        </div>
+    <div class="panel vitals">
+      <div class="hex"><label>PV (Atuais)<input id="pv-atual" type="text"></label></div>
+      <div class="hex"><label>AU (Atuais)<input id="au-atual" type="text"></label></div>
+      <div class="hex"><label>ST (Atuais)<input id="st-atual" type="text"></label></div>
+      <div class="hex"><label>SAN (Atual)<input id="san-atual" type="text"></label></div>
+    </div>
 
-        <div class="panel defesa">
-          <label>Defesa<input id="defesa" type="text"></label>
-          <small>= 10 + DES/10 + equipamentos + outros</small>
-        </div>
+    <div class="panel defesa">
+      <label>Defesa<input id="defesa" type="text"></label>
+      <small>= 10 + DES/10 + equipamentos + outros</small>
+    </div>
+  </div>
 
-        <div class="panel ataques">
-          <h3>Ataques</h3>
-          <div id="attacks-list" class="text"></div>
-          <button type="button" id="add-attack" class="add-btn">+ Ataque</button>
-        </div>
-      </div> <!-- fim da left-col -->
+  <!-- Conteúdo da Aba 2: Ataques e Perícias -->
+  <div id="tab-ataques-pericias" class="tab-content">
+    <div class="panel ataques">
+      <h3>Ataques</h3>
+      <div id="attacks-list" class="text"></div>
+      <button type="button" id="add-attack" class="add-btn">+ Ataque</button>
+    </div>
 
-      <!-- right-col começa aqui: Perícias e outras seções -->
-      <div class="right-col">
-        <div class="panel pericias">
-          <h2>Perícias</h2>
-          <div class="pericias-grid">
-            <!-- Acrobacia (DES) -->
-            <div class="pericia" data-attr="des">
-              <label>Acrobacia</label>
-              <div class="dados">
-                <span class="calc">+0</span>
-                <select class="modificador">
-                  <option value="0">0</option>
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="15">15</option>
-                </select>
-                <input type="text" class="outros" placeholder="Outros" value="0">
-                <button class="roll">🎲</button>
-              </div>
-            </div>
-
-            <!-- Adestramento (PRE) -->
-            <div class="pericia" data-attr="pre">
-              <label>Adestramento</label>
-              <div class="dados">
-                <span class="calc">+0</span>
-                <select class="modificador">
-                  <option value="0">0</option>
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="15">15</option>
-                </select>
-                <input type="text" class="outros" placeholder="Outros" value="0">
-                <button class="roll">🎲</button>
-              </div>
-            </div>
-
-             <!-- Alquimia (INT) -->
-            <div class="pericia" data-attr="int">
-              <label>Alquimia</label>
-              <div class="dados">
-                <span class="calc">+0</span>
-                <select class="modificador">
-                  <option value="0">0</option>
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="15">15</option>
-                </select>
-                <input type="text" class="outros" placeholder="Outros" value="0">
-                <button class="roll">🎲</button>
-              </div>
-            </div>
-
-            <!-- Auronismo (FLX) -->
-            <div class="pericia" data-attr="flx">
-              <label>Auronismo</label>
-              <div class="dados">
-                <span class="calc">+0</span>
-                <select class="modificador">
-                  <option value="0">0</option>
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="15">15</option>
-                </select>
-                <input type="text" class="outros" placeholder="Outros" value="0">
-                <button class="roll">🎲</button>
-              </div>
-            </div>
-
-            <!-- Artes (PRE) -->
-            <div class="pericia" data-attr="pre">
-              <label>Artes</label>
-              <div class="dados">
-                <span class="calc">+0</span>
-                <select class="modificador">
-                  <option value="0">0</option>
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="15">15</option>
-                </select>
-                <input type="text" class="outros" placeholder="Outros" value="0">
-                <button class="roll">🎲</button>
-              </div>
-            </div>
-
-            <!-- Atletismo (FOR) -->
-            <div class="pericia" data-attr="for">
-              <label>Atletismo</label>
-              <div class="dados">
-                <span class="calc">+0</span>
-                <select class="modificador">
-                  <option value="0">0</option>
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="15">15</option>
-                </select>
-                <input type="text" class="outros" placeholder="Outros" value="0">
-                <button class="roll">🎲</button>
-              </div>
-            </div>
-
-            <!-- Atualidades (INT) -->
-            <div class="pericia" data-attr="int">
-              <label>Atualidades</label>
-              <div class="dados">
-                <span class="calc">+0</span>
-                <select class="modificador">
-                  <option value="0">0</option>
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="15">15</option>
-                </select>
-                <input type="text" class="outros" placeholder="Outros" value="0">
-                <button class="roll">🎲</button>
-              </div>
-            </div>
-
-            <!-- Crime (DES) -->
-            <div class="pericia" data-attr="des">
-              <label>Crime</label>
-              <div class="dados">
-                <span class="calc">+0</span>
-                <select class="modificador">
-                  <option value="0">0</option>
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="15">15</option>
-                </select>
-                <input type="text" class="outros" placeholder="Outros" value="0">
-                <button class="roll">🎲</button>
-              </div>
-            </div>
-
-            <!-- Diplomacia (PRE) -->
-            <div class="pericia" data-attr="pre">
-              <label>Diplomacia</label>
-              <div class="dados">
-                <span class="calc">+0</span>
-                <select class="modificador">
-                  <option value="0">0</option>
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="15">15</option>
-                </select>
-                <input type="text" class="outros" placeholder="Outros" value="0">
-                <button class="roll">🎲</button>
-              </div>
-            </div>
-
-            <!-- Enganação (PRE) -->
-            <div class="pericia" data-attr="pre">
-              <label>Enganação</label>
-              <div class="dados">
-                <span class="calc">+0</span>
-                <select class="modificador">
-                  <option value="0">0</option>
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="15">15</option>
-                </select>
-                <input type="text" class="outros" placeholder="Outros" value="0">
-                <button class="roll">🎲</button>
-              </div>
-            </div>
-
-            <!-- Forja (FOR) -->
-            <div class="pericia" data-attr="for">
-              <label>Forja</label>
-              <div class="dados">
-                <span class="calc">+0</span>
-                <select class="modificador">
-                  <option value="0">0</option>
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="15">15</option>
-                </select>
-                <input type="text" class="outros" placeholder="Outros" value="0">
-                <button class="roll">🎲</button>
-              </div>
-            </div>
-
-            <!-- Fortitude (APT) -->
-            <div class="pericia" data-attr="apt">
-              <label>Fortitude</label>
-              <div class="dados">
-                <span class="calc">+0</span>
-                <select class="modificador">
-                  <option value="0">0</option>
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="15">15</option>
-                </select>
-                <input type="text" class="outros" placeholder="Outros" value="0">
-                <button class="roll">🎲</button>
-              </div>
-            </div>
-
-            <!-- Furtividade (DES) -->
-            <div class="pericia" data-attr="des">
-              <label>Furtividade</label>
-              <div class="dados">
-                <span class="calc">+0</span>
-                <select class="modificador">
-                  <option value="0">0</option>
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="15">15</option>
-                </select>
-                <input type="text" class="outros" placeholder="Outros" value="0">
-                <button class="roll">🎲</button>
-              </div>
-            </div>
-
-            <!-- Iniciativa (DES) -->
-            <div class="pericia" data-attr="des">
-              <label>Iniciativa</label>
-              <div class="dados">
-                <span class="calc">+0</span>
-                <select class="modificador">
-                  <option value="0">0</option>
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="15">15</option>
-                </select>
-                <input type="text" class="outros" placeholder="Outros" value="0">
-                <button class="roll">🎲</button>
-              </div>
-            </div>
-
-            <!-- Intimidação (PRE) -->
-            <div class="pericia" data-attr="pre">
-              <label>Intimidação</label>
-              <div class="dados">
-                <span class="calc">+0</span>
-                <select class="modificador">
-                  <option value="0">0</option>
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="15">15</option>
-                </select>
-                <input type="text" class="outros" placeholder="Outros" value="0">
-                <button class="roll">🎲</button>
-              </div>
-            </div>
-
-            <!-- Intuição (PRE) -->
-            <div class="pericia" data-attr="pre">
-              <label>Intuição</label>
-              <div class="dados">
-                <span class="calc">+0</span>
-                <select class="modificador">
-                  <option value="0">0</option>
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="15">15</option>
-                </select>
-                <input type="text" class="outros" placeholder="Outros" value="0">
-                <button class="roll">🎲</button>
-              </div>
-            </div>
-
-            <!-- Investigação (INT) -->
-            <div class="pericia" data-attr="int">
-              <label>Investigação</label>
-              <div class="dados">
-                <span class="calc">+0</span>
-                <select class="modificador">
-                  <option value="0">0</option>
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="15">15</option>
-                </select>
-                <input type="text" class="outros" placeholder="Outros" value="0">
-                <button class="roll">🎲</button>
-              </div>
-            </div>
-
-            <!-- Luta (FOR) -->
-            <div class="pericia" data-attr="for">
-              <label>Luta</label>
-              <div class="dados">
-                <span class="calc">+0</span>
-                <select class="modificador">
-                  <option value="0">0</option>
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="15">15</option>
-                </select>
-                <input type="text" class="outros" placeholder="Outros" value="0">
-                <button class="roll">🎲</button>
-              </div>
-            </div>
-
-            <!-- Medicina (INT) -->
-            <div class="pericia" data-attr="int">
-              <label>Medicina</label>
-              <div class="dados">
-                <span class="calc">+0</span>
-                <select class="modificador">
-                  <option value="0">0</option>
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="15">15</option>
-                </select>
-                <input type="text" class="outros" placeholder="Outros" value="0">
-                <button class="roll">🎲</button>
-              </div>
-            </div>
-
-            <!-- Percepção (PRE) -->
-            <div class="pericia" data-attr="pre">
-              <label>Percepção</label>
-              <div class="dados">
-                <span class="calc">+0</span>
-                <select class="modificador">
-                  <option value="0">0</option>
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="15">15</option>
-                </select>
-                <input type="text" class="outros" placeholder="Outros" value="0">
-                <button class="roll">🎲</button>
-              </div>
-            </div>
-
-            <!-- Pilotagem (DES) -->
-            <div class="pericia" data-attr="des">
-              <label>Pilotagem</label>
-              <div class="dados">
-                <span class="calc">+0</span>
-                <select class="modificador">
-                  <option value="0">0</option>
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="15">15</option>
-                </select>
-                <input type="text" class="outros" placeholder="Outros" value="0">
-                <button class="roll">🎲</button>
-              </div>
-            </div>
-
-            <!-- Pontaria (DES) -->
-            <div class="pericia" data-attr="des">
-              <label>Pontaria</label>
-              <div class="dados">
-                <span class="calc">+0</span>
-                <select class="modificador">
-                  <option value="0">0</option>
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="15">15</option>
-                </select>
-                <input type="text" class="outros" placeholder="Outros" value="0">
-                <button class="roll">🎲</button>
-              </div>
-            </div>
-
-            <!-- Reflexo (DES) -->
-            <div class="pericia" data-attr="des">
-              <label>Reflexo</label>
-              <div class="dados">
-                <span class="calc">+0</span>
-                <select class="modificador">
-                  <option value="0">0</option>
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="15">15</option>
-                </select>
-                <input type="text" class="outros" placeholder="Outros" value="0">
-                <button class="roll">🎲</button>
-              </div>
-            </div>
-
-            <!-- Religião (PRE) -->
-            <div class="pericia" data-attr="pre">
-              <label>Religião</label>
-              <div class="dados">
-                <span class="calc">+0</span>
-                <select class="modificador">
-                  <option value="0">0</option>
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="15">15</option>
-                </select>
-                <input type="text" class="outros" placeholder="Outros" value="0">
-                <button class="roll">🎲</button>
-              </div>
-            </div>
-
-            <!-- Sobrevivência (INT) -->
-            <div class="pericia" data-attr="int">
-              <label>Sobrevivência</label>
-              <div class="dados">
-                <span class="calc">+0</span>
-                <select class="modificador">
-                  <option value="0">0</option>
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="15">15</option>
-                </select>
-                <input type="text" class="outros" placeholder="Outros" value="0">
-                <button class="roll">🎲</button>
-              </div>
-            </div>
-
-            <!-- Tática (INT) -->
-            <div class="pericia" data-attr="int">
-              <label>Tática</label>
-              <div class="dados">
-                <span class="calc">+0</span>
-                <select class="modificador">
-                  <option value="0">0</option>
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="15">15</option>
-                </select>
-                <input type="text" class="outros" placeholder="Outros" value="0">
-                <button class="roll">🎲</button>
-              </div>
-            </div>
-
-            <!-- Vontade (PRE) -->
-            <div class="pericia" data-attr="pre">
-              <label>Vontade</label>
-              <div class="dados">
-                <span class="calc">+0</span>
-                <select class="modificador">
-                  <option value="0">0</option>
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="15">15</option>
-                </select>
-                <input type="text" class="outros" placeholder="Outros" value="0">
-                <button class="roll">🎲</button>
-              </div>
-            </div>
-
-          </div> <!-- fim pericias-grid -->
-        </div> <!-- fim pericias panel -->
-
-        <!-- Rolagens Situacionais -->
-        <div class="panel situacionais">
-          <h2>Rolagens Situacionais</h2>
-          
-          <div class="situacional-item">
-            <select class="sit-atributo">
-              <option value="">Atributo</option>
-              <option value="des">DES</option>
-              <option value="int">INT</option>
-              <option value="vig">VIG</option>
-              <option value="pre">PRE</option>
-              <option value="for">FOR</option>
-              <option value="apt">APT</option>
-              <option value="flx">FLX</option>
+    <div class="panel pericias">
+      <h2>Perícias</h2>
+      <div class="pericias-grid">
+        <div class="pericia" data-attr="des">
+          <label>Acrobacia</label>
+          <div class="dados">
+            <span class="calc">+0</span>
+            <select class="modificador">
+              <option value="0">0</option>
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
             </select>
-            <input type="text" class="sit-dados" placeholder="Dados" value="1" min="1">
-            <input type="text" class="sit-soma" placeholder="Soma" value="0">
-            <button class="sit-roll">🎲</button>
-          </div>
-
-          <div class="situacional-item">
-            <select class="sit-atributo">
-              <option value="">Atributo</option>
-              <option value="des">DES</option>
-              <option value="int">INT</option>
-              <option value="vig">VIG</option>
-              <option value="pre">PRE</option>
-              <option value="for">FOR</option>
-              <option value="apt">APT</option>
-              <option value="flx">FLX</option>
-            </select>
-            <input type="text" class="sit-dados" placeholder="Dados" value="1" min="1">
-            <input type="text" class="sit-soma" placeholder="Soma" value="0">
-            <button class="sit-roll">🎲</button>
-          </div>
-
-          <div class="situacional-item">
-            <select class="sit-atributo">
-              <option value="">Atributo</option>
-              <option value="des">DES</option>
-              <option value="int">INT</option>
-              <option value="vig">VIG</option>
-              <option value="pre">PRE</option>
-              <option value="for">FOR</option>
-              <option value="apt">APT</option>
-              <option value="flx">FLX</option>
-            </select>
-            <input type="text" class="sit-dados" placeholder="Dados" value="1" min="1">
-            <input type="text" class="sit-soma" placeholder="Soma" value="0">
-            <button class="sit-roll">🎲</button>
+            <input type="text" class="outros" placeholder="Outros" value="0">
+            <button class="roll">🎲</button>
           </div>
         </div>
-<footer class="footer">Umbrantium – Fichas salvas localmente no seu navegador</footer>
+
+        <div class="pericia" data-attr="pre">
+          <label>Adestramento</label>
+          <div class="dados">
+            <span class="calc">+0</span>
+            <select class="modificador">
+              <option value="0">0</option>
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+            </select>
+            <input type="text" class="outros" placeholder="Outros" value="0">
+            <button class="roll">🎲</button>
+          </div>
+        </div>
+
+        <div class="pericia" data-attr="int">
+          <label>Alquimia</label>
+          <div class="dados">
+            <span class="calc">+0</span>
+            <select class="modificador">
+              <option value="0">0</option>
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+            </select>
+            <input type="text" class="outros" placeholder="Outros" value="0">
+            <button class="roll">🎲</button>
+          </div>
+        </div>
+
+        <div class="pericia" data-attr="flx">
+          <label>Auronismo</label>
+          <div class="dados">
+            <span class="calc">+0</span>
+            <select class="modificador">
+              <option value="0">0</option>
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+            </select>
+            <input type="text" class="outros" placeholder="Outros" value="0">
+            <button class="roll">🎲</button>
+          </div>
+        </div>
+
+        <div class="pericia" data-attr="pre">
+          <label>Artes</label>
+          <div class="dados">
+            <span class="calc">+0</span>
+            <select class="modificador">
+              <option value="0">0</option>
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+            </select>
+            <input type="text" class="outros" placeholder="Outros" value="0">
+            <button class="roll">🎲</button>
+          </div>
+        </div>
+
+        <div class="pericia" data-attr="for">
+          <label>Atletismo</label>
+          <div class="dados">
+            <span class="calc">+0</span>
+            <select class="modificador">
+              <option value="0">0</option>
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+            </select>
+            <input type="text" class="outros" placeholder="Outros" value="0">
+            <button class="roll">🎲</button>
+          </div>
+        </div>
+
+        <div class="pericia" data-attr="int">
+          <label>Atualidades</label>
+          <div class="dados">
+            <span class="calc">+0</span>
+            <select class="modificador">
+              <option value="0">0</option>
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+            </select>
+            <input type="text" class="outros" placeholder="Outros" value="0">
+            <button class="roll">🎲</button>
+          </div>
+        </div>
+
+        <div class="pericia" data-attr="des">
+          <label>Crime</label>
+          <div class="dados">
+            <span class="calc">+0</span>
+            <select class="modificador">
+              <option value="0">0</option>
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+            </select>
+            <input type="text" class="outros" placeholder="Outros" value="0">
+            <button class="roll">🎲</button>
+          </div>
+        </div>
+
+        <div class="pericia" data-attr="pre">
+          <label>Diplomacia</label>
+          <div class="dados">
+            <span class="calc">+0</span>
+            <select class="modificador">
+              <option value="0">0</option>
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+            </select>
+            <input type="text" class="outros" placeholder="Outros" value="0">
+            <button class="roll">🎲</button>
+          </div>
+        </div>
+
+        <div class="pericia" data-attr="pre">
+          <label>Enganação</label>
+          <div class="dados">
+            <span class="calc">+0</span>
+            <select class="modificador">
+              <option value="0">0</option>
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+            </select>
+            <input type="text" class="outros" placeholder="Outros" value="0">
+            <button class="roll">🎲</button>
+          </div>
+        </div>
+
+        <div class="pericia" data-attr="for">
+          <label>Forja</label>
+          <div class="dados">
+            <span class="calc">+0</span>
+            <select class="modificador">
+              <option value="0">0</option>
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+            </select>
+            <input type="text" class="outros" placeholder="Outros" value="0">
+            <button class="roll">🎲</button>
+          </div>
+        </div>
+
+        <div class="pericia" data-attr="apt">
+          <label>Fortitude</label>
+          <div class="dados">
+            <span class="calc">+0</span>
+            <select class="modificador">
+              <option value="0">0</option>
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+            </select>
+            <input type="text" class="outros" placeholder="Outros" value="0">
+            <button class="roll">🎲</button>
+          </div>
+        </div>
+
+        <div class="pericia" data-attr="des">
+          <label>Furtividade</label>
+          <div class="dados">
+            <span class="calc">+0</span>
+            <select class="modificador">
+              <option value="0">0</option>
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+            </select>
+            <input type="text" class="outros" placeholder="Outros" value="0">
+            <button class="roll">🎲</button>
+          </div>
+        </div>
+
+        <div class="pericia" data-attr="des">
+          <label>Iniciativa</label>
+          <div class="dados">
+            <span class="calc">+0</span>
+            <select class="modificador">
+              <option value="0">0</option>
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+            </select>
+            <input type="text" class="outros" placeholder="Outros" value="0">
+            <button class="roll">🎲</button>
+          </div>
+        </div>
+
+        <div class="pericia" data-attr="pre">
+          <label>Intimidação</label>
+          <div class="dados">
+            <span class="calc">+0</span>
+            <select class="modificador">
+              <option value="0">0</option>
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+            </select>
+            <input type="text" class="outros" placeholder="Outros" value="0">
+            <button class="roll">🎲</button>
+          </div>
+        </div>
+
+        <div class="pericia" data-attr="pre">
+          <label>Intuição</label>
+          <div class="dados">
+            <span class="calc">+0</span>
+            <select class="modificador">
+              <option value="0">0</option>
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+            </select>
+            <input type="text" class="outros" placeholder="Outros" value="0">
+            <button class="roll">🎲</button>
+          </div>
+        </div>
+
+        <div class="pericia" data-attr="int">
+          <label>Investigação</label>
+          <div class="dados">
+            <span class="calc">+0</span>
+            <select class="modificador">
+              <option value="0">0</option>
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+            </select>
+            <input type="text" class="outros" placeholder="Outros" value="0">
+            <button class="roll">🎲</button>
+          </div>
+        </div>
+
+        <div class="pericia" data-attr="for">
+          <label>Luta</label>
+          <div class="dados">
+            <span class="calc">+0</span>
+            <select class="modificador">
+              <option value="0">0</option>
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+            </select>
+            <input type="text" class="outros" placeholder="Outros" value="0">
+            <button class="roll">🎲</button>
+          </div>
+        </div>
+
+        <div class="pericia" data-attr="int">
+          <label>Medicina</label>
+          <div class="dados">
+            <span class="calc">+0</span>
+            <select class="modificador">
+              <option value="0">0</option>
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+            </select>
+            <input type="text" class="outros" placeholder="Outros" value="0">
+            <button class="roll">🎲</button>
+          </div>
+        </div>
+
+        <div class="pericia" data-attr="pre">
+          <label>Percepção</label>
+          <div class="dados">
+            <span class="calc">+0</span>
+            <select class="modificador">
+              <option value="0">0</option>
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+            </select>
+            <input type="text" class="outros" placeholder="Outros" value="0">
+            <button class="roll">🎲</button>
+          </div>
+        </div>
+
+        <div class="pericia" data-attr="des">
+          <label>Pilotagem</label>
+          <div class="dados">
+            <span class="calc">+0</span>
+            <select class="modificador">
+              <option value="0">0</option>
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+            </select>
+            <input type="text" class="outros" placeholder="Outros" value="0">
+            <button class="roll">🎲</button>
+          </div>
+        </div>
+
+        <div class="pericia" data-attr="des">
+          <label>Pontaria</label>
+          <div class="dados">
+            <span class="calc">+0</span>
+            <select class="modificador">
+              <option value="0">0</option>
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+            </select>
+            <input type="text" class="outros" placeholder="Outros" value="0">
+            <button class="roll">🎲</button>
+          </div>
+        </div>
+
+        <div class="pericia" data-attr="des">
+          <label>Reflexo</label>
+          <div class="dados">
+            <span class="calc">+0</span>
+            <select class="modificador">
+              <option value="0">0</option>
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+            </select>
+            <input type="text" class="outros" placeholder="Outros" value="0">
+            <button class="roll">🎲</button>
+          </div>
+        </div>
+
+        <div class="pericia" data-attr="pre">
+          <label>Religião</label>
+          <div class="dados">
+            <span class="calc">+0</span>
+            <select class="modificador">
+              <option value="0">0</option>
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+            </select>
+            <input type="text" class="outros" placeholder="Outros" value="0">
+            <button class="roll">🎲</button>
+          </div>
+        </div>
+
+        <div class="pericia" data-attr="int">
+          <label>Sobrevivência</label>
+          <div class="dados">
+            <span class="calc">+0</span>
+            <select class="modificador">
+              <option value="0">0</option>
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+            </select>
+            <input type="text" class="outros" placeholder="Outros" value="0">
+            <button class="roll">🎲</button>
+          </div>
+        </div>
+
+        <div class="pericia" data-attr="int">
+          <label>Tática</label>
+          <div class="dados">
+            <span class="calc">+0</span>
+            <select class="modificador">
+              <option value="0">0</option>
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+            </select>
+            <input type="text" class="outros" placeholder="Outros" value="0">
+            <button class="roll">🎲</button>
+          </div>
+        </div>
+
+        <div class="pericia" data-attr="pre">
+          <label>Vontade</label>
+          <div class="dados">
+            <span class="calc">+0</span>
+            <select class="modificador">
+              <option value="0">0</option>
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+            </select>
+            <input type="text" class="outros" placeholder="Outros" value="0">
+            <button class="roll">🎲</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel situacionais">
+      <h2>Rolagens Situacionais</h2>
+      <div class="situacional-item">
+        <select class="sit-atributo">
+          <option value="">Atributo</option>
+          <option value="des">DES</option>
+          <option value="int">INT</option>
+          <option value="vig">VIG</option>
+          <option value="pre">PRE</option>
+          <option value="for">FOR</option>
+          <option value="apt">APT</option>
+          <option value="flx">FLX</option>
+        </select>
+        <input type="text" class="sit-dados" placeholder="Dados" value="1" min="1">
+        <input type="text" class="sit-soma" placeholder="Soma" value="0">
+        <button class="sit-roll">🎲</button>
+      </div>
+
+      <div class="situacional-item">
+        <select class="sit-atributo">
+          <option value="">Atributo</option>
+          <option value="des">DES</option>
+          <option value="int">INT</option>
+          <option value="vig">VIG</option>
+          <option value="pre">PRE</option>
+          <option value="for">FOR</option>
+          <option value="apt">APT</option>
+          <option value="flx">FLX</option>
+        </select>
+        <input type="text" class="sit-dados" placeholder="Dados" value="1" min="1">
+        <input type="text" class="sit-soma" placeholder="Soma" value="0">
+        <button class="sit-roll">🎲</button>
+      </div>
+
+      <div class="situacional-item">
+        <select class="sit-atributo">
+          <option value="">Atributo</option>
+          <option value="des">DES</option>
+          <option value="int">INT</option>
+          <option value="vig">VIG</option>
+          <option value="pre">PRE</option>
+          <option value="for">FOR</option>
+          <option value="apt">APT</option>
+          <option value="flx">FLX</option>
+        </select>
+        <input type="text" class="sit-dados" placeholder="Dados" value="1" min="1">
+        <input type="text" class="sit-soma" placeholder="Soma" value="0">
+        <button class="sit-roll">🎲</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">Umbrantium – Fichas salvas localmente no seu navegador</footer>
+</section>
       </div> <!-- fim right-col -->
   </main>
 </div>
