@@ -1029,6 +1029,12 @@ function escapeHtml(str){
 // ----------------------
 let habilidadeCounter = 0;
 
+function autoResizeTextarea(el){
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = el.scrollHeight + 'px';
+}
+
 function createHabilidadeEntry(nome="", custo="", distancia="", descricao=""){
     habilidadeCounter++;
     const id = `habilidade-${habilidadeCounter}`;
@@ -1054,9 +1060,17 @@ function createHabilidadeEntry(nome="", custo="", distancia="", descricao=""){
     wrapper.querySelectorAll('input, textarea').forEach(input => {
         input.addEventListener('input', saveHabilidades);
     });
+
+    const descricaoEl = wrapper.querySelector(".habilidade-descricao");
+    if (descricaoEl) {
+        descricaoEl.addEventListener('input', () => autoResizeTextarea(descricaoEl));
+    }
     
     const container = document.getElementById("habilidades-list");
-    if (container) container.appendChild(wrapper);
+    if (container) {
+        container.appendChild(wrapper);
+        autoResizeTextarea(descricaoEl);
+    }
 }
 
 function saveHabilidades(){

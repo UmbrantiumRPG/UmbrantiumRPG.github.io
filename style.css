@@ -857,6 +857,14 @@ button.remove:hover {
   justify-content: center;
 }
 
+.habilidade-descricao {
+  min-height: 60px;
+  resize: none;
+  overflow: hidden;
+  line-height: 1.5;
+  font-size: 14px;
+}
+
 /* Equipamentos */
 .equipamentos-panel {
   min-height: 700px;
@@ -2444,7 +2452,7 @@ button.remove:hover {
     box-shadow: 4px 0 20px rgba(0, 0, 0, 0.5);
   }
 
-  .toggle {
+  .sidebar .toggle {
     display: flex !important;
     position: fixed;
     top: 15px;
@@ -2784,17 +2792,66 @@ button.remove:hover {
   }
 
   .pericia {
-    grid-template-columns: 120px 1fr;
+    grid-template-columns: 1fr;
     padding: 10px;
+    gap: 6px;
   }
 
   .pericia label {
     font-size: 13px;
+    white-space: normal;
   }
 
   .pericia input {
     font-size: 14px;
     padding: 8px;
+  }
+
+  .pericia .dados {
+    grid-template-columns: 32px 1fr 1fr 32px;
+    gap: 4px;
+    width: 100%;
+  }
+
+  .pericia .dados > * {
+    min-width: 0;
+  }
+
+  .pericia .calc {
+    font-size: 12px;
+    padding: 4px 2px;
+  }
+
+  .pericia .modificador,
+  .pericia .outros {
+    font-size: 11px;
+    padding: 4px 2px;
+  }
+
+  .pericia .roll {
+    width: 32px;
+    padding: 4px;
+  }
+
+  .situacional-item {
+    grid-template-columns: minmax(70px, 1fr) minmax(50px, 1fr) minmax(50px, 1fr) 34px;
+    gap: 4px;
+    padding: 8px 6px;
+  }
+
+  .situacional-item > * {
+    min-width: 0;
+  }
+
+  .sit-atributo,
+  .sit-dados,
+  .sit-soma {
+    font-size: 11px;
+    padding: 6px 2px;
+  }
+
+  .sit-roll {
+    width: 34px;
   }
 
   .character-equipment {
@@ -2840,6 +2897,31 @@ button.remove:hover {
   .equip-slot input {
     padding: 8px 6px;
     font-size: 12px;
+  }
+
+  .habilidade-entry {
+    position: relative;
+    padding: 14px;
+  }
+
+  .habilidade-header {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding-right: 30px;
+  }
+
+  .habilidade-nome {
+    font-size: 16px;
+  }
+
+  .habilidade-header .remove-btn {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+  }
+
+  .habilidade-descricao {
+    font-size: 14px;
   }
 
   .habilidades-layout {
